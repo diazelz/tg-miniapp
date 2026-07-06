@@ -1,0 +1,12 @@
+# СЕКРЕТЫ — никогда не коммитим токен!
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
