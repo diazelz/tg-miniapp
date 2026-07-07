@@ -5,9 +5,12 @@
 const WEBAPP_URL = process.env.WEBAPP_URL || "https://d1-miniapp.netlify.app/";
 
 exports.handler = async (event) => {
-  // Telegram шлёт только POST. На всё остальное отвечаем "ok", чтобы не падать.
+  // GET — health-check: показывает, видит ли функция токен (сам токен не раскрываем).
   if (event.httpMethod !== "POST") {
-    return { statusCode: 200, body: "ok" };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ ok: true, hasToken: Boolean(process.env.BOT_TOKEN) }),
+    };
   }
 
   const TOKEN = process.env.BOT_TOKEN;
