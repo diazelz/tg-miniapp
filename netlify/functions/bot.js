@@ -26,6 +26,24 @@ exports.handler = async (event) => {
   }
 
   const msg = update.message;
+  const api = (method, body) =>
+    fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+  // Оплата Stars: pre_checkout_query нужно подтвердить в течение 10 секунд.
+  if (update.pre_checkout_query) {
+    await api("answerPreCheckoutQuery", { pre_checkout_query_id: update.pre_checkout_query.id, ok: true });
+    return { statusCode: 200, body: "ok" };
+  }
+
+  // Успешная оплата звёздами — благодарим пользователя.
+  if (msg && msg.successful_payment) {
+    await api("sendMessage", { chat_id: msg.chat.id, text: "Спасибо за покупку! ⭐ Подписка активна." });
+    return { statusCode: 200, body: "ok" };
+  }
 
   // На /start (и на любой первый контакт) — показываем кнопку Launch.
   if (msg && msg.text && msg.text.startsWith("/start")) {
