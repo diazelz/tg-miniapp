@@ -1,7 +1,7 @@
-# Netlify публикует ТОЛЬКО статический сайт из папки webapp.
-# base = webapp -> Netlify заходит в webapp и не видит requirements.txt в корне,
-# поэтому не пытается ставить Python-зависимости. Сборки нет — просто раздаём файлы.
+# Netlify: статический сайт из webapp + serverless-функция бота из netlify/functions.
+# base не задаём (корень). Python-бот лежит в bot/, поэтому в корне нет
+# requirements.txt и Netlify не пытается ставить Python-зависимости.
 [build]
-  base = "webapp"
-  publish = "."
+  publish = "webapp"
+  functions = "netlify/functions"
   command = ""
