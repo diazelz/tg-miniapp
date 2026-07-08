@@ -211,6 +211,9 @@
     animation:confetti-fall 1.25s var(--ease) forwards;}
   @keyframes confetti-fall{0%{opacity:1;transform:translate(0,0) rotate(0);}100%{opacity:0;transform:translate(var(--dx),340px) rotate(var(--dr));}}
 
+  @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
+  body{animation:pageIn .3s ease;}
+  body.leaving{opacity:0;transition:opacity .18s ease;}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
@@ -384,6 +387,8 @@
   const tg = window.Telegram?.WebApp;
   if (tg){ tg.ready(); tg.expand(); try{ tg.setHeaderColor("#0E0E10"); tg.setBackgroundColor("#0E0E10"); }catch(e){} }
   function haptic(t){ try{ tg?.HapticFeedback?.impactOccurred(t||'light'); }catch(e){} }
+  function navigate(url){ haptic('light'); document.body.classList.add('leaving'); setTimeout(()=>location.href=url, 170); }
+  document.addEventListener('click', function(e){ const a=e.target.closest('a[href]'); if(!a) return; const h=a.getAttribute('href'); if(!h||h.startsWith('http')||h.startsWith('#')||a.target) return; e.preventDefault(); navigate(h); });
 
   function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   function crossfade(el){ if(!el) return; el.classList.remove('swap-in'); void el.offsetWidth; el.classList.add('swap-in'); }

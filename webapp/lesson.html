@@ -47,6 +47,9 @@
   .prog i{transform-origin:left;animation:growbar 1s cubic-bezier(.22,1,.36,1) .2s backwards;}
   @keyframes growbar{from{transform:scaleX(0);}to{transform:scaleX(1);}}
   .cta{background:linear-gradient(135deg,#FF6FA3,var(--accent));box-shadow:0 12px 32px rgba(255,78,138,.4);}
+  @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
+  body{animation:pageIn .3s ease;}
+  body.leaving{opacity:0;transition:opacity .18s ease;}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
 </style>
 </head>
@@ -94,7 +97,9 @@
 <script>
   const tg = window.Telegram?.WebApp;
   if (tg){ tg.ready(); tg.expand(); try{ tg.setHeaderColor("#0E0E10"); tg.setBackgroundColor("#0E0E10"); }catch(e){} }
-  function startPractice(){ tg?.HapticFeedback?.impactOccurred("medium"); location.href='games.html?game=quiz'; }
+  function navigate(url){ try{ tg?.HapticFeedback?.impactOccurred('light'); }catch(e){} document.body.classList.add('leaving'); setTimeout(()=>location.href=url, 170); }
+  document.addEventListener('click', function(e){ const a=e.target.closest('a[href]'); if(!a) return; const h=a.getAttribute('href'); if(!h||h.startsWith('http')||h.startsWith('#')||a.target) return; e.preventDefault(); navigate(h); });
+  function startPractice(){ tg?.HapticFeedback?.impactOccurred("medium"); navigate('games.html?game=quiz'); }
 </script>
 </body>
 </html>
