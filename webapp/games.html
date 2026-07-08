@@ -20,6 +20,7 @@
     --r:22px; --r-sm:15px; --ease:cubic-bezier(.22,1,.36,1);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html{overflow-x:hidden;}
   html,body{background:var(--bg);color:var(--white);font-family:"Manrope",-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;}
   body{max-width:460px;margin:0 auto;min-height:100vh;position:relative;overflow-x:hidden;}
   .wrap{padding:max(18px,env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom));}
@@ -57,15 +58,20 @@
   .btn-ghost{flex:none;background:var(--card);color:var(--white);border:1px solid var(--line-2);border-radius:15px;
     padding:0 18px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;height:50px;}
 
-  /* Sub-screens */
-  .subscreen{position:fixed;top:0;bottom:0;left:50%;transform:translate(50%,0);width:100%;max-width:460px;background:var(--bg);z-index:20;
-    display:flex;flex-direction:column;visibility:hidden;}
-  .subscreen.anim{transform:translate(150%,0);transition:transform .42s var(--ease);visibility:visible;}
-  .subscreen.open{transform:translate(50%,0);visibility:visible;}
-  .nav{height:52px;display:flex;align-items:center;padding:8px 12px 0;flex:none;}
+  /* Sub-screens — центрирование + слайд справа. Итоговое состояние задано стилем (устойчиво). */
+  .subscreen{position:fixed;inset:0;background:var(--bg);z-index:20;
+    display:flex;flex-direction:column;transform:translateX(100%);transition:transform .42s var(--ease);will-change:transform;}
+  .subscreen.open{transform:translateX(0px);}
+  .subscreen.open .sub-body>*{animation:rise .5s var(--ease) backwards;}
+  .subscreen.open .sub-body>*:nth-child(2){animation-delay:.05s}
+  .subscreen.open .sub-body>*:nth-child(3){animation-delay:.1s}
+  .subscreen.open .sub-body>*:nth-child(4){animation-delay:.15s}
+  .subscreen.open .sub-body>*:nth-child(5){animation-delay:.2s}
+  .subscreen.open .sub-body>*:nth-child(6){animation-delay:.25s}
+  .nav{height:52px;display:flex;align-items:center;padding:8px 12px 0;flex:none;width:100%;max-width:460px;margin:0 auto;}
   .nav button{background:none;border:none;color:var(--accent);font-size:16px;font-weight:600;font-family:inherit;display:flex;align-items:center;gap:2px;cursor:pointer;}
   .nav .ic{font-size:22px;}
-  .sub-body{flex:1;overflow-y:auto;padding:8px 20px 40px;scrollbar-width:none;}
+  .sub-body{flex:1;overflow-y:auto;padding:8px 20px 40px;scrollbar-width:none;width:100%;max-width:460px;margin:0 auto;}
   .sub-body::-webkit-scrollbar{display:none;}
   .sub-body h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:8px 0 4px;}
   .sub-body .sub{font-size:14px;color:var(--dim);margin-bottom:18px;line-height:1.5;}
@@ -179,6 +185,32 @@
 
   .swap-in{animation:swapIn .4s var(--ease) backwards;}
   @keyframes swapIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+
+  /* Стаггер-появление хаба */
+  .wrap>*{animation:rise .5s var(--ease) backwards;}
+  .wrap>*:nth-child(2){animation-delay:.04s} .wrap>*:nth-child(3){animation-delay:.08s}
+  .wrap>*:nth-child(4){animation-delay:.12s} .wrap>*:nth-child(5){animation-delay:.16s}
+  .wrap>*:nth-child(6){animation-delay:.20s} .wrap>*:nth-child(7){animation-delay:.24s}
+  .wrap>*:nth-child(8){animation-delay:.28s} .wrap>*:nth-child(9){animation-delay:.32s}
+  .wrap>*:nth-child(n+10){animation-delay:.36s}
+
+  /* Сочные кнопки + свечение */
+  .btn{background:linear-gradient(135deg,#FF6FA3,var(--accent));box-shadow:0 8px 22px rgba(255,78,138,.32);
+    transition:transform .14s var(--ease),box-shadow .2s,filter .2s;}
+  .btn:active{transform:scale(.97);filter:brightness(1.05);}
+  .hero{box-shadow:0 14px 40px rgba(255,78,138,.28);}
+  .hero .btn{background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.18);}
+  .game-card{transition:transform .2s var(--ease),border-color .2s,background .2s,box-shadow .2s;}
+  .game-card:active{transform:scale(.98);border-color:var(--line-2);}
+  .game-card .gi{box-shadow:0 0 0 0 var(--accent-soft);transition:transform .2s var(--ease);}
+  .game-card:active .gi{transform:scale(1.08) rotate(-4deg);}
+
+  /* Конфетти */
+  .confetti{position:fixed;top:36%;width:9px;height:9px;border-radius:2px;z-index:300;pointer-events:none;
+    animation:confetti-fall 1.25s var(--ease) forwards;}
+  @keyframes confetti-fall{0%{opacity:1;transform:translate(0,0) rotate(0);}100%{opacity:0;transform:translate(var(--dx),340px) rotate(var(--dr));}}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
@@ -365,13 +397,28 @@
     haptic('light');
     if(BUILDERS[name]) BUILDERS[name]();
     const s = document.getElementById('screen-'+name);
-    s.classList.add('anim'); void s.offsetWidth; s.classList.add('open');
+    s.classList.remove('closing'); s.classList.add('open');
   }
   function closeGame(name){
     haptic('light');
-    const s = document.getElementById('screen-'+name);
-    s.classList.remove('open');
-    setTimeout(()=>s.classList.remove('anim'), 420);
+    document.getElementById('screen-'+name).classList.remove('open');
+  }
+
+  // Конфетти при победе — лёгкие DOM-частицы, уважают reduced-motion
+  function confetti(){
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    haptic('medium');
+    const colors=['#FF4E8A','#9FE7DB','#FFCE47','#35C56A','#fff'];
+    for(let i=0;i<30;i++){
+      const p=document.createElement('div'); p.className='confetti';
+      p.style.left=(50+(Math.random()*44-22))+'%';
+      p.style.background=colors[i%colors.length];
+      p.style.setProperty('--dx',(Math.random()*280-140)+'px');
+      p.style.setProperty('--dr',(Math.random()*720-360)+'deg');
+      p.style.animationDelay=(Math.random()*0.12)+'s';
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(),1500);
+    }
   }
 
   /* ---------- Word Drop ---------- */
@@ -427,7 +474,7 @@
     let correct=0;
     wdSlots.forEach(s=>{ const chip=s.querySelector('.chip'); if(chip&&chip.dataset.word===s.dataset.answer){ s.classList.add('right'); correct++; } else if(chip){ s.classList.add('wrong'); } });
     const res=document.getElementById('wdResult');
-    if(correct===wdSlots.length){ res.textContent='🎉 Идеально — все слова на месте!'; res.className='game-result ok'; haptic('medium'); }
+    if(correct===wdSlots.length){ res.textContent='🎉 Идеально — все слова на месте!'; res.className='game-result ok'; confetti(); }
     else{ res.textContent=correct+' / '+wdSlots.length+' верно — попробуй ещё.'; res.className='game-result bad'; }
   }
 
@@ -472,7 +519,7 @@
       const c2=dotCenter(rd); thread.path.setAttribute('d',threadPath(thread.x1,thread.y1,c2.x,c2.y)); thread.path.classList.add('done');
       thread.dot.classList.add('linked'); rd.classList.add('linked'); const rightItem=rd.closest('.m-item');
       sendPulse(thread.path,()=>{ leftItem.classList.add('matched'); rightItem.classList.add('matched'); flashOnce(leftItem,'flash-ok'); flashOnce(rightItem,'flash-ok'); haptic('light'); matchLeft++;
-        if(matchLeft===matchTotal){ const res=document.getElementById('matchResult'); res.textContent='🎉 Все пары связаны!'; res.className='game-result ok'; haptic('medium'); } });
+        if(matchLeft===matchTotal){ const res=document.getElementById('matchResult'); res.textContent='🎉 Все пары связаны!'; res.className='game-result ok'; confetti(); } });
     } else if(rd&&!rd.classList.contains('linked')){ flashOnce(leftItem,'flash-bad'); flashOnce(rd.closest('.m-item'),'flash-bad'); retractThread(thread.path); }
     else{ retractThread(thread.path); }
     thread=null;
@@ -513,7 +560,7 @@
     QUIZ.forEach((_,i)=>{ const b=document.createElement('i'); if(i<quizIdx) b.className='on'; prog.appendChild(b); });
     const area=document.getElementById('quizArea');
     if(quizIdx>=QUIZ.length){ prog.querySelectorAll('i').forEach(i=>i.className='on');
-      area.innerHTML='<div class="result-card"><h3>'+quizScore+' / '+QUIZ.length+' верно</h3><p>'+(quizScore===QUIZ.length?'Без единой ошибки! 🔥':'Неплохо — сыграй ещё раз.')+'</p><button class="btn" onclick="buildQuiz()"><svg class="ic"><use href="#i-play"/></svg> Ещё раз</button></div>'; return; }
+      area.innerHTML='<div class="result-card"><h3>'+quizScore+' / '+QUIZ.length+' верно</h3><p>'+(quizScore===QUIZ.length?'Без единой ошибки! 🔥':'Неплохо — сыграй ещё раз.')+'</p><button class="btn" onclick="buildQuiz()"><svg class="ic"><use href="#i-play"/></svg> Ещё раз</button></div>'; confetti(); return; }
     const Q=QUIZ[quizIdx];
     let html='<div class="quiz-q">'+Q.q+'</div><div class="quiz-sub">Вопрос '+(quizIdx+1)+' из '+QUIZ.length+'</div>';
     Q.opts.forEach((o,i)=>{ html+='<div class="quiz-opt" data-i="'+i+'">'+o+'</div>'; });
@@ -539,7 +586,7 @@
   function buildWordBuilder(){ WORD_BUILDER=shuffle([...WORD_BUILDER_POOL]).slice(0,5); wbIdx=0; renderWB(); }
   function renderWB(){
     const area=document.getElementById('wbArea');
-    if(wbIdx>=WORD_BUILDER.length){ area.innerHTML=winCard('Все слова собраны!','buildWordBuilder()'); return; }
+    if(wbIdx>=WORD_BUILDER.length){ area.innerHTML=winCard('Все слова собраны!','buildWordBuilder()'); confetti(); return; }
     wbWord=WORD_BUILDER[wbIdx].word; const letters=shuffle(wbWord.split(''));
     let html='<div class="wb-hint">Составь слово для:<br><b style="color:var(--white);font-size:17px;">'+WORD_BUILDER[wbIdx].hint+'</b></div>';
     html+='<div class="wb-answer" id="wbAnswer"></div>';
@@ -575,7 +622,7 @@
   function buildSentence(){ SENTENCES=shuffle([...SENTENCES_POOL]).slice(0,4); ssIdx=0; renderSS(); }
   function renderSS(){
     const area=document.getElementById('ssArea');
-    if(ssIdx>=SENTENCES.length){ area.innerHTML=winCard('Все предложения собраны!','buildSentence()'); return; }
+    if(ssIdx>=SENTENCES.length){ area.innerHTML=winCard('Все предложения собраны!','buildSentence()'); confetti(); return; }
     const S=SENTENCES[ssIdx]; const shuffled=shuffle(S.words.map((w,i)=>({w,i})));
     let html='<div class="wb-hint">Расставь слова по порядку:<br><b style="color:var(--white);font-size:16px;">'+S.hint+'</b></div>';
     html+='<div class="ss-line" id="ssLine"></div>';
@@ -617,7 +664,7 @@
       memMoves++; document.getElementById('memMoves').textContent=memMovesLabel(memMoves); memLock=true;
       const [a,b]=memFlipped;
       if(a.dataset.id===b.dataset.id){ setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); memFlipped=[]; memLock=false; memMatched++; haptic('light');
-        if(memMatched===MEMORY.length){ const res=document.getElementById('memResult'); res.textContent='🎉 Собрано за '+memMovesLabel(memMoves)+'!'; res.className='game-result ok'; haptic('medium'); } },450); }
+        if(memMatched===MEMORY.length){ const res=document.getElementById('memResult'); res.textContent='🎉 Собрано за '+memMovesLabel(memMoves)+'!'; res.className='game-result ok'; confetti(); } },450); }
       else{ setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); memFlipped=[]; memLock=false; },850); }
     }
   }
@@ -638,7 +685,7 @@
   function renderOdd(){
     const area=document.getElementById('oddArea'),prog=document.getElementById('oddProg');
     if(oddIdx>=ODD.length){ prog.innerHTML=ODD.map(()=>'<i class="on"></i>').join('');
-      area.innerHTML='<div class="result-card"><h3>'+oddScore+' / '+ODD.length+'</h3><p>'+(oddScore===ODD.length?'Острый глаз! 🔥':'Хорошо — попробуй ещё.')+'</p><button class="btn" onclick="buildOdd()"><svg class="ic"><use href="#i-play"/></svg> Ещё раз</button></div>'; return; }
+      area.innerHTML='<div class="result-card"><h3>'+oddScore+' / '+ODD.length+'</h3><p>'+(oddScore===ODD.length?'Острый глаз! 🔥':'Хорошо — попробуй ещё.')+'</p><button class="btn" onclick="buildOdd()"><svg class="ic"><use href="#i-play"/></svg> Ещё раз</button></div>'; confetti(); return; }
     prog.innerHTML=ODD.map((_,i)=>'<i class="'+(i<oddIdx?'on':'')+'"></i>').join('');
     const O=ODD[oddIdx];
     area.innerHTML='<div class="odd-cat">Какое слово лишнее?</div><div class="odd-grid">'+O.words.map((w,i)=>'<div class="odd-opt" data-i="'+i+'">'+w+'</div>').join('')+'</div>';

@@ -61,6 +61,19 @@
 
   .note{text-align:center;font-size:12px;color:var(--dim);margin-top:18px;line-height:1.6;padding:0 10px;}
   .note .ic{color:var(--gold);font-size:13px;vertical-align:-2px;}
+
+  /* Премиум-полировка */
+  @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+  .hero,.pack,.note{animation:rise .5s cubic-bezier(.22,1,.36,1) backwards;}
+  .pack:nth-of-type(2){animation-delay:.06s;} .pack:nth-of-type(3){animation-delay:.12s;} .pack:nth-of-type(4){animation-delay:.18s;}
+  .pack{transition:transform .18s cubic-bezier(.22,1,.36,1),border-color .2s,box-shadow .2s;}
+  .pack:active{transform:scale(.99);}
+  .pack.popular{box-shadow:0 16px 44px rgba(255,78,138,.22);}
+  .crown{box-shadow:0 0 40px rgba(255,78,138,.28);}
+  .buy{transition:transform .14s,filter .2s;} .buy:active{transform:scale(.98);filter:brightness(1.06);}
+  .buy.primary{background:linear-gradient(135deg,#FF6FA3,var(--accent));box-shadow:0 8px 22px rgba(255,78,138,.34);}
+  .close{transition:transform .12s;} .close:active{transform:scale(.92);}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
 </style>
 </head>
 <body>
