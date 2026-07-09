@@ -38,6 +38,10 @@
     }
 
     /* --- Шапка --- */
+    .brandbar { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+    .brand-logo { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, var(--orange), var(--lavender)); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(255,78,138,.3); }
+    .brand-logo svg { width: 21px; height: 21px; }
+    .brand-name { font-family: "Fredoka", sans-serif; font-size: 18px; font-weight: 700; letter-spacing: .2px; }
     .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
     .user { display: flex; align-items: center; gap: 12px; }
     .avatar {
@@ -210,6 +214,13 @@
       <div class="lang-opt" data-lang="de" onclick="pickLang(this)"><span class="fl">DE</span><span class="nm">Немецкий</span><span class="rd"></span></div>
     </div>
     <button class="onb-cta" onclick="finishOnb()">Продолжить</button>
+  </div>
+
+  <div class="brandbar">
+    <div class="brand-logo">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="6" y="7" width="36" height="27" rx="12" fill="#fff"/><path d="M16 30 L16 43 L31 32 Z" fill="#fff"/><circle cx="18" cy="20.5" r="2.9" fill="#FF4E8A"/><circle cx="24" cy="20.5" r="2.9" fill="#22B8A6"/><circle cx="30" cy="20.5" r="2.9" fill="#FF4E8A"/></svg>
+    </div>
+    <span class="brand-name">Lingo</span>
   </div>
 
   <div class="topbar">
