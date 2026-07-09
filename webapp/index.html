@@ -138,14 +138,36 @@
     .onb.show { display: flex; }
     .onb h2 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin-top: 12px; }
     .onb p { font-size: 15px; color: var(--dim); margin-top: 8px; line-height: 1.5; }
-    .onb-list { margin-top: 26px; display: flex; flex-direction: column; gap: 12px; }
-    .lang-opt { display: flex; align-items: center; gap: 14px; background: var(--card-dark); border: 2px solid transparent;
-      border-radius: 18px; padding: 16px; cursor: pointer; transition: border-color .15s, background .15s; }
-    .lang-opt.sel { border-color: var(--orange); background: rgba(255,78,138,.10); }
-    .lang-opt .fl { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-family: "Fredoka", sans-serif; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: .5px; flex: none; }
-    .lang-opt .nm { font-size: 17px; font-weight: 700; flex: 1; }
-    .lang-opt .rd { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); flex: none; }
-    .lang-opt.sel .rd { border-color: var(--orange); background: var(--orange); box-shadow: inset 0 0 0 4px var(--bg); }
+    .onb-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; min-height: 40px; }
+    .onb-back { width: 40px; height: 40px; border-radius: 50%; background: var(--card-dark); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; }
+    .onb-back svg { width: 22px; height: 22px; }
+    .onb-back.hide { visibility: hidden; }
+    .onb-progress { flex: 1; height: 6px; border-radius: 99px; background: var(--card-dark); overflow: hidden; }
+    .onb-progress i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #FF6FA3, var(--orange)); transition: width .35s cubic-bezier(.22,1,.36,1); }
+    .onb-steps { flex: 1; overflow-y: auto; scrollbar-width: none; }
+    .onb-steps::-webkit-scrollbar { display: none; }
+    .onb-step { display: none; }
+    .onb-step.active { display: block; animation: rise .4s cubic-bezier(.22,1,.36,1); }
+    .onb-list { margin-top: 22px; display: flex; flex-direction: column; gap: 11px; }
+    .opt { display: flex; align-items: center; gap: 13px; background: var(--card-dark); border: 2px solid transparent; border-radius: 18px; padding: 13px; cursor: pointer; transition: border-color .15s, background .15s, transform .12s; }
+    .opt:active { transform: scale(.99); }
+    .opt.sel { border-color: var(--orange); background: rgba(255,78,138,.10); }
+    .opt-badge { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-family: "Fredoka", sans-serif; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: .3px; flex: none; }
+    .opt.sel .opt-badge { background: var(--orange); }
+    .opt-badge svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .opt-tx { flex: 1; } .opt-tx b { font-size: 16px; font-weight: 700; display: block; } .opt-tx span { font-size: 12.5px; color: var(--dim); }
+    .opt .rd { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); flex: none; }
+    .opt.sel .rd { border-color: var(--orange); background: var(--orange); box-shadow: inset 0 0 0 4px var(--bg); }
+    .onb-finish { text-align: center; padding-top: 18px; }
+    .onb-gift { width: 100px; height: 100px; border-radius: 30px; background: linear-gradient(135deg, var(--orange), var(--lavender)); display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; box-shadow: 0 16px 44px rgba(255,78,138,.4); animation: logoPop .6s cubic-bezier(.34,1.56,.64,1) both; }
+    .onb-gift svg { width: 52px; height: 52px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .trial-chip { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; background: rgba(53,197,106,.16); color: #7ee6a2; font-weight: 700; font-size: 13px; padding: 8px 15px; border-radius: 99px; }
+    /* Баннер триала на главной */
+    .trial-banner { display: none; align-items: center; gap: 12px; background: rgba(53,197,106,.12); border: 1px solid rgba(53,197,106,.3); border-radius: 16px; padding: 12px 14px; margin-bottom: 16px; cursor: pointer; }
+    .trial-banner .tb-ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(53,197,106,.2); color: #35C56A; display: flex; align-items: center; justify-content: center; flex: none; }
+    .trial-banner .tb-ic svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .trial-banner .tb-tx { flex: 1; } .trial-banner .tb-tx b { font-size: 14px; font-weight: 700; display: block; } .trial-banner .tb-tx span { font-size: 12px; color: var(--dim); }
+    .trial-banner .tb-ar { color: var(--dim); font-size: 18px; }
     .onb-cta { margin-top: auto; background: var(--orange); color: #fff; border: none; border-radius: 16px; padding: 16px;
       font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
 
@@ -160,7 +182,7 @@
     .start-btn { transition: transform .14s; } .start-btn:active { transform: scale(.97); }
     .onb-cta { background: linear-gradient(135deg,#FF6FA3,var(--orange)); box-shadow: 0 10px 26px rgba(255,78,138,.34); transition: transform .14s; }
     .onb-cta:active { transform: scale(.98); }
-    .lang-opt { transition: border-color .15s, background .15s, transform .12s; } .lang-opt:active { transform: scale(.99); }
+    /* переходы опций заданы в .opt */
     .streak, .icon-btn { transition: transform .12s; } .icon-btn:active, .streak:active { transform: scale(.94); }
 
     /* Переходы между страницами */
@@ -200,14 +222,66 @@
   </div>
 
   <div class="onb" id="onb">
-    <h2>Какой язык учим?</h2>
-    <p>Выбери язык — начнём с него. Другие можно открыть позже.</p>
-    <div class="onb-list">
-      <div class="lang-opt sel" data-lang="en" onclick="pickLang(this)"><span class="fl">EN</span><span class="nm">Английский</span><span class="rd"></span></div>
-      <div class="lang-opt" data-lang="es" onclick="pickLang(this)"><span class="fl">ES</span><span class="nm">Испанский</span><span class="rd"></span></div>
-      <div class="lang-opt" data-lang="de" onclick="pickLang(this)"><span class="fl">DE</span><span class="nm">Немецкий</span><span class="rd"></span></div>
+    <div class="onb-top">
+      <button class="onb-back hide" id="onbBack" onclick="onbPrev()" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <div class="onb-progress"><i id="onbBar" style="width:20%"></i></div>
     </div>
-    <button class="onb-cta" onclick="finishOnb()">Продолжить</button>
+
+    <div class="onb-steps">
+      <div class="onb-step active" data-step="0">
+        <h2>Какой язык учим?</h2>
+        <p>С него и начнём. Другие откроешь позже.</p>
+        <div class="onb-list" data-group="lang">
+          <div class="opt sel" data-val="en" onclick="pickOpt(this)"><span class="opt-badge">EN</span><div class="opt-tx"><b>Английский</b></div><span class="rd"></span></div>
+          <div class="opt" data-val="es" onclick="pickOpt(this)"><span class="opt-badge">ES</span><div class="opt-tx"><b>Испанский</b></div><span class="rd"></span></div>
+          <div class="opt" data-val="de" onclick="pickOpt(this)"><span class="opt-badge">DE</span><div class="opt-tx"><b>Немецкий</b></div><span class="rd"></span></div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="1">
+        <h2>Зачем учишь?</h2>
+        <p>Подстроим программу под твою цель.</p>
+        <div class="onb-list" data-group="goal">
+          <div class="opt sel" data-val="study" onclick="pickOpt(this)"><span class="opt-badge"><svg viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.3 2.7 2.5 6 2.5s6-1.2 6-2.5v-5"/></svg></span><div class="opt-tx"><b>Учёба и экзамены</b></div><span class="rd"></span></div>
+          <div class="opt" data-val="work" onclick="pickOpt(this)"><span class="opt-badge"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span><div class="opt-tx"><b>Работа и карьера</b></div><span class="rd"></span></div>
+          <div class="opt" data-val="travel" onclick="pickOpt(this)"><span class="opt-badge"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></svg></span><div class="opt-tx"><b>Путешествия</b></div><span class="rd"></span></div>
+          <div class="opt" data-val="fun" onclick="pickOpt(this)"><span class="opt-badge"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-8A5 5 0 0 1 12 6a5 5 0 0 1 9.5 7c-2.5 3.5-9.5 8-9.5 8z"/></svg></span><div class="opt-tx"><b>Для себя</b></div><span class="rd"></span></div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="2">
+        <h2>Твой уровень сейчас?</h2>
+        <p>Не переживай — всегда можно поменять.</p>
+        <div class="onb-list" data-group="level">
+          <div class="opt sel" data-val="a1" onclick="pickOpt(this)"><span class="opt-badge">A1</span><div class="opt-tx"><b>Начинаю с нуля</b><span>Почти ничего не знаю</span></div><span class="rd"></span></div>
+          <div class="opt" data-val="a2" onclick="pickOpt(this)"><span class="opt-badge">A2</span><div class="opt-tx"><b>Знаю базу</b><span>Простые слова и фразы</span></div><span class="rd"></span></div>
+          <div class="opt" data-val="b1" onclick="pickOpt(this)"><span class="opt-badge">B1</span><div class="opt-tx"><b>Средний</b><span>Могу поддержать разговор</span></div><span class="rd"></span></div>
+          <div class="opt" data-val="b2" onclick="pickOpt(this)"><span class="opt-badge">B2+</span><div class="opt-tx"><b>Уверенный</b><span>Говорю довольно свободно</span></div><span class="rd"></span></div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="3">
+        <h2>Сколько заниматься в день?</h2>
+        <p>Выбери комфортный ритм — можно изменить.</p>
+        <div class="onb-list" data-group="daily">
+          <div class="opt" data-val="5" onclick="pickOpt(this)"><span class="opt-badge">5</span><div class="opt-tx"><b>5 минут</b><span>Лёгкий старт</span></div><span class="rd"></span></div>
+          <div class="opt sel" data-val="10" onclick="pickOpt(this)"><span class="opt-badge">10</span><div class="opt-tx"><b>10 минут</b><span>Оптимально</span></div><span class="rd"></span></div>
+          <div class="opt" data-val="15" onclick="pickOpt(this)"><span class="opt-badge">15</span><div class="opt-tx"><b>15 минут</b><span>Серьёзный настрой</span></div><span class="rd"></span></div>
+          <div class="opt" data-val="30" onclick="pickOpt(this)"><span class="opt-badge">30</span><div class="opt-tx"><b>30 минут</b><span>Интенсив</span></div><span class="rd"></span></div>
+        </div>
+      </div>
+
+      <div class="onb-step" data-step="4">
+        <div class="onb-finish">
+          <div class="onb-gift"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S12 2 8.5 2 5 5 8 7"/><path d="M12 7s0-5 3.5-5S19 5 16 7"/></svg></div>
+          <h2>Всё готово! 🎉</h2>
+          <p>Собрали план под тебя. И дарим <b style="color:#fff">бесплатный Pro на 30 дней</b> — все игры, ИИ-тьютор и языки без ограничений.</p>
+          <div class="trial-chip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Бесплатный месяц активирован</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="onb-cta" id="onbCta" onclick="onbNext()">Продолжить</button>
   </div>
 
   <div class="brandbar">
@@ -230,6 +304,12 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </button>
     </div>
+  </div>
+
+  <div class="trial-banner" id="trialBanner" onclick="navigate('paywall.html')">
+    <span class="tb-ic"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S12 2 8.5 2 5 5 8 7"/><path d="M12 7s0-5 3.5-5S19 5 16 7"/></svg></span>
+    <div class="tb-tx"><b>Бесплатный Pro активен</b><span>Осталось <span class="tb-days"></span></span></div>
+    <span class="tb-ar">›</span>
   </div>
 
   <div class="bento">
@@ -322,23 +402,57 @@
     function go(){ tg?.HapticFeedback?.impactOccurred("light"); }
 
     const LANGS = { en:{name:'Английский',code:'EN'}, es:{name:'Испанский',code:'ES'}, de:{name:'Немецкий',code:'DE'} };
-    let chosenLang = 'en';
-
-    function pickLang(el){
-      document.querySelectorAll('.lang-opt').forEach(o=>o.classList.remove('sel'));
-      el.classList.add('sel'); chosenLang = el.dataset.lang;
-      tg?.HapticFeedback?.impactOccurred('light');
-    }
-    function finishOnb(){
-      localStorage.setItem('lingo_lang', chosenLang);
-      applyLang(chosenLang);
-      document.getElementById('onb').classList.remove('show');
-      tg?.HapticFeedback?.impactOccurred('medium');
-    }
     function applyLang(code){
       const L = LANGS[code]; if(!L) return;
       const flag = document.querySelector('.course-flag'); const name = document.querySelector('.course-name');
       if(flag) flag.textContent = L.code; if(name) name.textContent = L.name;
+    }
+
+    // ---- Калибровка (многошаговый онбординг) ----
+    const onbAnswers = { lang:'en', goal:'study', level:'a1', daily:'10' };
+    let onbStep = 0; const ONB_LAST = 4;
+    function pickOpt(el){
+      const list = el.closest('.onb-list'); const group = list.dataset.group;
+      list.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+      el.classList.add('sel'); onbAnswers[group] = el.dataset.val;
+      tg?.HapticFeedback?.impactOccurred('light');
+    }
+    function showStep(n){
+      onbStep = n;
+      document.querySelectorAll('.onb-step').forEach(s=>s.classList.toggle('active', +s.dataset.step===n));
+      document.getElementById('onbBar').style.width = ((n+1)/(ONB_LAST+1)*100)+'%';
+      document.getElementById('onbBack').classList.toggle('hide', n===0);
+      document.getElementById('onbCta').textContent = (n===ONB_LAST) ? 'Начать учиться' : 'Продолжить';
+      document.querySelector('.onb-steps').scrollTop = 0;
+    }
+    function onbPrev(){ if(onbStep>0){ tg?.HapticFeedback?.impactOccurred('light'); showStep(onbStep-1); } }
+    function onbNext(){
+      tg?.HapticFeedback?.impactOccurred(onbStep===ONB_LAST?'medium':'light');
+      if(onbStep < ONB_LAST){ showStep(onbStep+1); return; }
+      localStorage.setItem('lingo_lang', onbAnswers.lang);
+      localStorage.setItem('lingo_goal', onbAnswers.goal);
+      localStorage.setItem('lingo_level', onbAnswers.level);
+      localStorage.setItem('lingo_daily', onbAnswers.daily);
+      localStorage.setItem('lingo_onboarded', '1');
+      if(!localStorage.getItem('lingo_trial_start')) localStorage.setItem('lingo_trial_start', String(Date.now()));
+      applyLang(onbAnswers.lang);
+      document.getElementById('onb').classList.remove('show');
+      showTrialBanner();
+    }
+
+    // ---- Бесплатный триал 30 дней ----
+    function trialDaysLeft(){
+      const s = +localStorage.getItem('lingo_trial_start'); if(!s) return 0;
+      return Math.max(0, 30 - Math.floor((Date.now()-s)/86400000));
+    }
+    function plural(n,one,few,many){ const d=n%10,dd=n%100; if(d===1&&dd!==11) return one; if(d>=2&&d<=4&&(dd<10||dd>=20)) return few; return many; }
+    function showTrialBanner(){
+      const b = document.getElementById('trialBanner'); if(!b) return;
+      const d = trialDaysLeft();
+      if(localStorage.getItem('lingo_trial_start') && d>0){
+        b.querySelector('.tb-days').textContent = d + ' ' + plural(d,'день','дня','дней');
+        b.style.display = 'flex';
+      } else { b.style.display = 'none'; }
     }
 
     // Плавный переход на другую страницу (fade-out → навигация)
@@ -349,12 +463,13 @@
       e.preventDefault(); navigate(h);
     });
 
-    // Splash при запуске → затем онбординг (если язык ещё не выбран)
+    // Splash → калибровка (если ещё не проходил)
     const savedLang = localStorage.getItem('lingo_lang');
     if (savedLang) applyLang(savedLang);
+    showTrialBanner();
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
-      if (!savedLang) document.getElementById('onb').classList.add('show');
+      if (!localStorage.getItem('lingo_onboarded')) { showStep(0); document.getElementById('onb').classList.add('show'); }
     }, 1600);
   </script>
 </body>

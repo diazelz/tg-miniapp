@@ -107,8 +107,8 @@
   <div class="avatar" id="avatar">Д</div>
   <div>
     <h3 id="username">Дан</h3>
-    <span>Учит английский</span>
-    <div class="lvlpill"><svg class="ic"><use href="#i-target"/></svg> Уровень A2</div>
+    <span id="profLang">Учит английский</span>
+    <div class="lvlpill"><svg class="ic"><use href="#i-target"/></svg> <span id="profLevel">Уровень A2</span></div>
   </div>
 </div>
 
@@ -123,10 +123,10 @@
   <div class="xpbar"><i style="width:57%"></i></div>
 </div>
 
-<div class="pro-card" onclick="navigate('paywall.html')">
-  <h3>Lingo Pro</h3>
-  <p>ИИ-тьютор, все языки, план A1→C2 и игры без лимитов.</p>
-  <span class="b">Открыть за <span class="star">★</span> 150</span>
+<div class="pro-card" id="proCard" onclick="navigate('paywall.html')">
+  <h3 id="proTitle">Lingo Pro</h3>
+  <p id="proSub">ИИ-тьютор, все языки, план A1→C2 и игры без лимитов.</p>
+  <span class="b" id="proBtn">Открыть за <span class="star">★</span> 150</span>
 </div>
 
 <div class="sec">Достижения · 3 из 12</div>
@@ -161,6 +161,22 @@
   }
   function navigate(url){ try{ tg?.HapticFeedback?.impactOccurred('light'); }catch(e){} document.body.classList.add('leaving'); setTimeout(()=>location.href=url, 170); }
   document.addEventListener('click', function(e){ const a=e.target.closest('a[href]'); if(!a) return; const h=a.getAttribute('href'); if(!h||h.startsWith('http')||h.startsWith('#')||a.target) return; e.preventDefault(); navigate(h); });
+
+  (function(){
+    function pl(n,a,b,c){const x=n%10,y=n%100;if(x===1&&y!==11)return a;if(x>=2&&x<=4&&(y<10||y>=20))return b;return c;}
+    const LN={en:'английский',es:'испанский',de:'немецкий'};
+    const lang=localStorage.getItem('lingo_lang'); if(lang&&LN[lang]) document.getElementById('profLang').textContent='Учит '+LN[lang];
+    const lvl=localStorage.getItem('lingo_level'); if(lvl) document.getElementById('profLevel').textContent='Уровень '+lvl.toUpperCase();
+    const s=+localStorage.getItem('lingo_trial_start');
+    if(s){ const d=Math.max(0,30-Math.floor((Date.now()-s)/86400000));
+      if(d>0){
+        document.getElementById('proTitle').textContent='Pro активен · бесплатно';
+        document.getElementById('proSub').textContent='Пробный месяц: всё открыто. Осталось '+d+' '+pl(d,'день','дня','дней')+'.';
+        document.getElementById('proBtn').textContent='Осталось '+d+' '+pl(d,'день','дня','дней');
+        document.getElementById('proCard').style.background='linear-gradient(135deg,#35C56A,#1f9e57)';
+      }
+    }
+  })();
 </script>
 </body>
 </html>
