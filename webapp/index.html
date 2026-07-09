@@ -7,7 +7,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -25,10 +25,10 @@
     html, body {
       background: var(--bg);
       color: var(--white);
-      font-family: "Outfit", -apple-system, "Segoe UI", sans-serif;
+      font-family: "Nunito", -apple-system, "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    .name, .plan-title, .daily-title, .course-name, .section-title, .splash-word, .onb h2 { font-family: "Bricolage Grotesque", "Outfit", sans-serif; letter-spacing: -.02em; }
+    .name, .plan-title, .daily-title, .course-name, .section-title, .splash-word, .onb h2 { font-family: "Fredoka", "Nunito", sans-serif; letter-spacing: -.02em; }
 
     body {
       max-width: 460px;
@@ -99,7 +99,7 @@
       grid-column: 1 / -1; background: #fff; color: #17181f; border-radius: 28px;
       padding: 18px 20px; display: flex; align-items: center; gap: 16px; margin-top: 0;
     }
-    .course-flag { width: 56px; height: 56px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+    .course-flag { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #FF6FA3, var(--orange)); display: flex; align-items: center; justify-content: center; font-family: "Fredoka", sans-serif; font-size: 20px; font-weight: 700; color: #fff; letter-spacing: .5px; flex-shrink: 0; }
     .course-info { flex: 1; }
     .course-name { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
     .course-sub { font-size: 13px; font-weight: 600; color: #8b8b90; margin-top: 2px; }
@@ -110,7 +110,7 @@
 
     /* Список языков */
     .lang-row { display: flex; align-items: center; gap: 12px; background: var(--card-dark); border-radius: 20px; padding: 14px 16px; margin-bottom: 10px; }
-    .lang-emoji { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .lang-emoji { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-family: "Fredoka", sans-serif; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: .5px; }
     .lang-info { flex: 1; }
     .lang-name { font-size: 15px; font-weight: 700; }
     .lang-prog { font-size: 12px; font-weight: 500; color: var(--dim); margin-top: 2px; }
@@ -138,7 +138,7 @@
     .lang-opt { display: flex; align-items: center; gap: 14px; background: var(--card-dark); border: 2px solid transparent;
       border-radius: 18px; padding: 16px; cursor: pointer; transition: border-color .15s, background .15s; }
     .lang-opt.sel { border-color: var(--orange); background: rgba(255,78,138,.10); }
-    .lang-opt .fl { font-size: 30px; width: 44px; text-align: center; }
+    .lang-opt .fl { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-family: "Fredoka", sans-serif; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: .5px; flex: none; }
     .lang-opt .nm { font-size: 17px; font-weight: 700; flex: 1; }
     .lang-opt .rd { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); flex: none; }
     .lang-opt.sel .rd { border-color: var(--orange); background: var(--orange); box-shadow: inset 0 0 0 4px var(--bg); }
@@ -188,7 +188,13 @@
 
   <div class="splash" id="splash">
     <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.4 7.2L21.6 12l-7.2 2.4L12 21.6 9.6 14.4 2.4 12l7.2-2.4z"/></svg>
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <rect x="6" y="7" width="36" height="27" rx="12" fill="#fff"/>
+        <path d="M16 30 L16 43 L31 32 Z" fill="#fff"/>
+        <circle cx="18" cy="20.5" r="2.7" fill="#FF4E8A"/>
+        <circle cx="24" cy="20.5" r="2.7" fill="#22B8A6"/>
+        <circle cx="30" cy="20.5" r="2.7" fill="#FF4E8A"/>
+      </svg>
     </div>
     <div class="splash-word">Lingo</div>
     <div class="splash-tag">Учи языки играючи</div>
@@ -199,9 +205,9 @@
     <h2>Какой язык учим?</h2>
     <p>Выбери язык — начнём с него. Другие можно открыть позже.</p>
     <div class="onb-list">
-      <div class="lang-opt sel" data-lang="en" onclick="pickLang(this)"><span class="fl">🇬🇧</span><span class="nm">Английский</span><span class="rd"></span></div>
-      <div class="lang-opt" data-lang="es" onclick="pickLang(this)"><span class="fl">🇪🇸</span><span class="nm">Испанский</span><span class="rd"></span></div>
-      <div class="lang-opt" data-lang="de" onclick="pickLang(this)"><span class="fl">🇩🇪</span><span class="nm">Немецкий</span><span class="rd"></span></div>
+      <div class="lang-opt sel" data-lang="en" onclick="pickLang(this)"><span class="fl">EN</span><span class="nm">Английский</span><span class="rd"></span></div>
+      <div class="lang-opt" data-lang="es" onclick="pickLang(this)"><span class="fl">ES</span><span class="nm">Испанский</span><span class="rd"></span></div>
+      <div class="lang-opt" data-lang="de" onclick="pickLang(this)"><span class="fl">DE</span><span class="nm">Немецкий</span><span class="rd"></span></div>
     </div>
     <button class="onb-cta" onclick="finishOnb()">Продолжить</button>
   </div>
@@ -256,7 +262,7 @@
 
     <!-- Белая карточка: текущий курс -->
     <div class="course" onclick="navigate('lesson.html')">
-      <div class="course-flag">🇬🇧</div>
+      <div class="course-flag">EN</div>
       <div class="course-info">
         <div class="course-name">Английский</div>
         <div class="course-sub">Уровень A2 · 4 из 5 уроков</div>
@@ -274,7 +280,7 @@
   <div class="section-title">Мои языки</div>
 
   <div class="lang-row" onclick="go('Открыть испанский')">
-    <div class="lang-emoji">🇪🇸</div>
+    <div class="lang-emoji">ES</div>
     <div class="lang-info">
       <div class="lang-name">Испанский</div>
       <div class="lang-prog">Уровень A1 · 340 XP</div>
@@ -282,7 +288,7 @@
     </div>
   </div>
   <div class="lang-row" onclick="go('Открыть немецкий')">
-    <div class="lang-emoji">🇩🇪</div>
+    <div class="lang-emoji">DE</div>
     <div class="lang-info">
       <div class="lang-name">Немецкий</div>
       <div class="lang-prog">Уровень A1 · 120 XP</div>
@@ -312,7 +318,7 @@
     }
     function go(){ tg?.HapticFeedback?.impactOccurred("light"); }
 
-    const LANGS = { en:{name:'Английский',flag:'🇬🇧'}, es:{name:'Испанский',flag:'🇪🇸'}, de:{name:'Немецкий',flag:'🇩🇪'} };
+    const LANGS = { en:{name:'Английский',code:'EN'}, es:{name:'Испанский',code:'ES'}, de:{name:'Немецкий',code:'DE'} };
     let chosenLang = 'en';
 
     function pickLang(el){
@@ -329,7 +335,7 @@
     function applyLang(code){
       const L = LANGS[code]; if(!L) return;
       const flag = document.querySelector('.course-flag'); const name = document.querySelector('.course-name');
-      if(flag) flag.textContent = L.flag; if(name) name.textContent = L.name;
+      if(flag) flag.textContent = L.code; if(name) name.textContent = L.name;
     }
 
     // Плавный переход на другую страницу (fade-out → навигация)
