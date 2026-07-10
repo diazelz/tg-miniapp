@@ -225,6 +225,12 @@
   @keyframes pageIn{from{opacity:0;}to{opacity:1;}}
   body{animation:pageIn .3s ease;}
   body.leaving{opacity:0;transition:opacity .18s ease;}
+  .lockwall{position:fixed;inset:0;background:var(--bg);z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  .lockwall .lw-ic{width:90px;height:90px;border-radius:26px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 16px 44px rgba(255,78,138,.4);}
+  .lockwall .lw-ic svg{width:46px;height:46px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .lockwall h2{font-family:"Fredoka","Nunito",sans-serif;font-size:24px;font-weight:700;letter-spacing:-.02em;}
+  .lockwall p{color:var(--dim);font-size:15px;line-height:1.5;margin:10px 0 24px;max-width:300px;}
+  .lockwall .btn{max-width:280px;}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
@@ -399,6 +405,13 @@
     <div class="quiz-prog" id="oddProg"></div>
     <div id="oddArea"></div>
   </div>
+</div>
+
+<div class="lockwall" id="lockwall">
+  <div class="lw-ic"><svg viewBox="0 0 24 24"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-1.8 12H4.8z"/></svg></div>
+  <h2>Пробный период истёк</h2>
+  <p>Оформи Lingo Pro, чтобы снова играть без ограничений — все игры, ИИ-тьютор и языки.</p>
+  <button class="btn" onclick="navigate('paywall.html')"><svg class="ic fill"><use href="#i-play"/></svg> Открыть Pro</button>
 </div>
 
 <script>
@@ -725,6 +738,11 @@
   // Автозапуск игры по ссылке ?game=quiz (из экрана урока)
   const startParam = new URLSearchParams(location.search).get('game');
   if (startParam && BUILDERS[startParam]) openGame(startParam);
+
+  // Гейт: если доступ истёк (по данным сервера) — показываем экран Pro
+  if (localStorage.getItem('lingo_access') === 'locked') {
+    document.getElementById('lockwall').style.display = 'flex';
+  }
 </script>
 </body>
 </html>

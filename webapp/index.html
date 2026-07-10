@@ -168,6 +168,8 @@
     .trial-banner .tb-ic svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .trial-banner .tb-tx { flex: 1; } .trial-banner .tb-tx b { font-size: 14px; font-weight: 700; display: block; } .trial-banner .tb-tx span { font-size: 12px; color: var(--dim); }
     .trial-banner .tb-ar { color: var(--dim); font-size: 18px; }
+    .trial-banner.locked { background: rgba(255,78,138,.12); border-color: rgba(255,78,138,.35); }
+    .trial-banner.locked .tb-ic { background: rgba(255,78,138,.2); color: var(--orange); }
     .onb-cta { margin-top: auto; background: var(--orange); color: #fff; border: none; border-radius: 16px; padding: 16px;
       font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
 
@@ -438,6 +440,7 @@
       applyLang(onbAnswers.lang);
       document.getElementById('onb').classList.remove('show');
       showTrialBanner();
+      syncUser(onbAnswers);
     }
 
     // ---- Бесплатный триал 30 дней ----
@@ -448,11 +451,33 @@
     function plural(n,one,few,many){ const d=n%10,dd=n%100; if(d===1&&dd!==11) return one; if(d>=2&&d<=4&&(dd<10||dd>=20)) return few; return many; }
     function showTrialBanner(){
       const b = document.getElementById('trialBanner'); if(!b) return;
-      const d = trialDaysLeft();
-      if(localStorage.getItem('lingo_trial_start') && d>0){
-        b.querySelector('.tb-days').textContent = d + ' ' + plural(d,'день','дня','дней');
-        b.style.display = 'flex';
-      } else { b.style.display = 'none'; }
+      let access = localStorage.getItem('lingo_access');
+      let days = +localStorage.getItem('lingo_daysleft');
+      if(!access){ const s=+localStorage.getItem('lingo_trial_start'); if(s){ const dl=trialDaysLeft(); access = dl>0?'pro':'locked'; days=dl; } }
+      const title = b.querySelector('.tb-tx b'); const sub = b.querySelector('.tb-tx > span');
+      if(access==='pro' && days>0){
+        b.classList.remove('locked');
+        title.textContent='Бесплатный Pro активен';
+        sub.innerHTML='Осталось <span class="tb-days">'+days+' '+plural(days,'день','дня','дней')+'</span>';
+        b.style.display='flex';
+      } else if(access==='locked'){
+        b.classList.add('locked');
+        title.textContent='Пробный период истёк';
+        sub.textContent='Оформи Pro, чтобы открыть всё снова';
+        b.style.display='flex';
+      } else { b.style.display='none'; }
+    }
+    async function syncUser(calibration){
+      if(!tg?.initData) return; // вне Telegram — остаётся локальный режим
+      try{
+        const res = await fetch('/.netlify/functions/user', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ initData: tg.initData, calibration: calibration||null }) });
+        const d = await res.json();
+        if(!d.ok) return;
+        localStorage.setItem('lingo_access', d.access);
+        localStorage.setItem('lingo_daysleft', String(d.daysLeft));
+        localStorage.setItem('lingo_source', d.source);
+        showTrialBanner();
+      }catch(e){}
     }
 
     // Плавный переход на другую страницу (fade-out → навигация)
@@ -467,6 +492,7 @@
     const savedLang = localStorage.getItem('lingo_lang');
     if (savedLang) applyLang(savedLang);
     showTrialBanner();
+    syncUser();
     setTimeout(() => {
       document.getElementById('splash').classList.add('hide');
       if (!localStorage.getItem('lingo_onboarded')) { showStep(0); document.getElementById('onb').classList.add('show'); }

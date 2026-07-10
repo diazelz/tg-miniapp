@@ -39,9 +39,23 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: "ok" };
   }
 
-  // Успешная оплата звёздами — благодарим пользователя.
+  // Успешная оплата звёздами — продлеваем подписку Pro на 30 дней в БД.
   if (msg && msg.successful_payment) {
-    await api("sendMessage", { chat_id: msg.chat.id, text: "Спасибо за покупку! ⭐ Подписка активна." });
+    try {
+      const { getStore } = require("@netlify/blobs");
+      const store = getStore("users");
+      const uid = String(msg.from.id);
+      const now = Date.now();
+      const rec = (await store.get(uid, { type: "json" })) || {
+        user_id: msg.from.id, created_at: now, trial_start: now,
+      };
+      const base = rec.sub_expires && rec.sub_expires > now ? rec.sub_expires : now;
+      rec.sub_expires = base + 30 * 86400000;
+      rec.plan = "pro";
+      rec.first_name = msg.from.first_name || rec.first_name || "";
+      await store.setJSON(uid, rec);
+    } catch (e) {}
+    await api("sendMessage", { chat_id: msg.chat.id, text: "Спасибо за покупку! ⭐ Подписка Pro активна на 30 дней." });
     return { statusCode: 200, body: "ok" };
   }
 
