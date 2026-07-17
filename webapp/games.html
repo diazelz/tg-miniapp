@@ -39,7 +39,9 @@
   .ic.fill{fill:currentColor;stroke:none;}
   .num{font-variant-numeric:tabular-nums;}
 
-  .head{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  .energy{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-family:"Fredoka","Nunito",sans-serif;font-weight:700;font-size:15px;}
+  .energy .ic{font-size:16px;}
   .iconbtn{width:42px;height:42px;border-radius:50%;background:var(--card);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;text-decoration:none;}
   .greet{font-size:14px;color:var(--dim);margin-top:6px;}
   .h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:2px;}
@@ -250,11 +252,13 @@
   <symbol id="i-sort" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
   <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3" y="8" width="12" height="13" rx="2"/><path d="M8.5 5.5 9 4l11 3-1.5 11"/></symbol>
   <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></symbol>
 </defs></svg>
 
 <div class="wrap">
   <div class="head">
     <a class="iconbtn" href="index.html" aria-label="Назад"><svg class="ic"><use href="#i-chevron-left"/></svg></a>
+    <div class="energy" id="energy" style="display:none"><svg class="ic fill" style="color:#FFCE47"><use href="#i-bolt"/></svg><span id="energyVal">5</span><span style="opacity:.45">/5</span></div>
   </div>
   <div class="greet">Играй и учись</div>
   <div class="h1">Игры</div>
@@ -408,10 +412,11 @@
 </div>
 
 <div class="lockwall" id="lockwall">
-  <div class="lw-ic"><svg viewBox="0 0 24 24"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-1.8 12H4.8z"/></svg></div>
-  <h2>Пробный период истёк</h2>
-  <p>Оформи Lingo Pro, чтобы снова играть без ограничений — все игры, ИИ-тьютор и языки.</p>
-  <button class="btn" onclick="navigate('paywall.html')"><svg class="ic fill"><use href="#i-play"/></svg> Открыть Pro</button>
+  <div class="lw-ic"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></div>
+  <h2>Энергия закончилась</h2>
+  <p>Бесплатно — 5 игр в день. Завтра энергия пополнится, или открой Lingo Pro для безлимита.</p>
+  <button class="btn" style="max-width:280px;" onclick="navigate('paywall.html')">Открыть Pro</button>
+  <button class="btn-ghost" style="max-width:280px;width:100%;margin-top:12px;" onclick="hideLimit()">Позже</button>
 </div>
 
 <script>
@@ -429,7 +434,39 @@
   }
 
   const BUILDERS = { worddrop:buildWordDrop, match:buildMatch, quiz:buildQuiz, wordbuilder:buildWordBuilder, sentence:buildSentence, memory:buildMemory, odd:buildOdd };
+  // ---- Лимиты для бесплатного тарифа: 5 игр в день (энергия) ----
+  const MAX_ENERGY = 5;
+  function isPro(){
+    const a = localStorage.getItem('lingo_access');
+    if(a==='pro') return true;
+    if(a==='locked') return false;
+    const s = +localStorage.getItem('lingo_trial_start');
+    return !!(s && (Date.now()-s) < 30*86400000);
+  }
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function getEnergy(){
+    if(localStorage.getItem('lingo_energy_date') !== todayStr()){
+      localStorage.setItem('lingo_energy_date', todayStr());
+      localStorage.setItem('lingo_energy', String(MAX_ENERGY));
+    }
+    return +localStorage.getItem('lingo_energy');
+  }
+  function setEnergy(v){ localStorage.setItem('lingo_energy', String(Math.max(0, Math.min(MAX_ENERGY, v)))); updateEnergyUI(); }
+  function updateEnergyUI(){
+    const el = document.getElementById('energy'); if(!el) return;
+    if(isPro()){ el.style.display='none'; return; }
+    el.style.display='inline-flex';
+    document.getElementById('energyVal').textContent = getEnergy();
+  }
+  function showLimit(){ haptic('medium'); document.getElementById('lockwall').style.display='flex'; }
+  function hideLimit(){ document.getElementById('lockwall').style.display='none'; }
+
   function openGame(name){
+    if(!isPro()){
+      const e = getEnergy();
+      if(e <= 0){ showLimit(); return; }
+      setEnergy(e - 1);
+    }
     haptic('light');
     if(BUILDERS[name]) BUILDERS[name]();
     const s = document.getElementById('screen-'+name);
@@ -739,10 +776,8 @@
   const startParam = new URLSearchParams(location.search).get('game');
   if (startParam && BUILDERS[startParam]) openGame(startParam);
 
-  // Гейт: если доступ истёк (по данным сервера) — показываем экран Pro
-  if (localStorage.getItem('lingo_access') === 'locked') {
-    document.getElementById('lockwall').style.display = 'flex';
-  }
+  // Показываем счётчик энергии для бесплатного тарифа (для Pro — скрыт)
+  updateEnergyUI();
 </script>
 </body>
 </html>
