@@ -2,7 +2,7 @@
 // Telegram сам присылает сюда POST при каждом сообщении пользователю бота.
 // Токен берётся из переменной окружения BOT_TOKEN (задаётся в настройках Netlify).
 
-const WEBAPP_URL = process.env.WEBAPP_URL || "https://d1-miniapp.netlify.app/";
+const WEBAPP_URL = process.env.WEBAPP_URL || "https://example.netlify.app/";
 
 exports.handler = async (event) => {
   // GET — health-check: показывает, видит ли функция токен (сам токен не раскрываем).
@@ -26,38 +26,6 @@ exports.handler = async (event) => {
   }
 
   const msg = update.message;
-  const api = (method, body) =>
-    fetch(`https://api.telegram.org/bot${TOKEN}/${method}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-  // Оплата Stars: pre_checkout_query нужно подтвердить в течение 10 секунд.
-  if (update.pre_checkout_query) {
-    await api("answerPreCheckoutQuery", { pre_checkout_query_id: update.pre_checkout_query.id, ok: true });
-    return { statusCode: 200, body: "ok" };
-  }
-
-  // Успешная оплата звёздами — продлеваем подписку Pro на 30 дней в БД.
-  if (msg && msg.successful_payment) {
-    try {
-      const { getStore } = require("@netlify/blobs");
-      const store = getStore("users");
-      const uid = String(msg.from.id);
-      const now = Date.now();
-      const rec = (await store.get(uid, { type: "json" })) || {
-        user_id: msg.from.id, created_at: now, trial_start: now,
-      };
-      const base = rec.sub_expires && rec.sub_expires > now ? rec.sub_expires : now;
-      rec.sub_expires = base + 30 * 86400000;
-      rec.plan = "pro";
-      rec.first_name = msg.from.first_name || rec.first_name || "";
-      await store.setJSON(uid, rec);
-    } catch (e) {}
-    await api("sendMessage", { chat_id: msg.chat.id, text: "Спасибо за покупку! ⭐ Подписка Pro активна на 30 дней." });
-    return { statusCode: 200, body: "ok" };
-  }
 
   // На /start (и на любой первый контакт) — показываем кнопку Launch.
   if (msg && msg.text && msg.text.startsWith("/start")) {
