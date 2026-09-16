@@ -33,7 +33,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN", "ВСТАВЬ_СЮДА_ТОКЕН")
 
 # HTTPS-адрес твоего Mini App (например, https://твой-проект.netlify.app).
 # Telegram открывает Mini App ТОЛЬКО по https, локальный http не подойдёт.
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://example.netlify.app")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://d1-miniapp.netlify.app")
 # ---------------------------------------------------------------------------
 
 logging.basicConfig(level=logging.INFO)

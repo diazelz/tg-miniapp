@@ -2,7 +2,7 @@
 // Telegram сам присылает сюда POST при каждом сообщении пользователю бота.
 // Токен берётся из переменной окружения BOT_TOKEN (задаётся в настройках Netlify).
 
-const WEBAPP_URL = process.env.WEBAPP_URL || "https://example.netlify.app/";
+const WEBAPP_URL = process.env.WEBAPP_URL || "https://d1-miniapp.netlify.app/";
 
 exports.handler = async (event) => {
   // GET — health-check: показывает, видит ли функция токен (сам токен не раскрываем).
