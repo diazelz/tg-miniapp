@@ -168,25 +168,21 @@
       padding: 16px; cursor: pointer; transition: transform .15s;
     }
     .subject-card:active { transform: scale(.98); }
-    /* Бейдж предмета: нейтральный фон карточки + акцентная обводка/глиф + пара точек-искр
-       по контуру (тот же приём, что у капли/стрика), а не сплошная заливка цветом */
+    /* Бейдж предмета: нейтральный фон карточки + цветная обводка и глиф в цвете
+       из нашей палитры — без заливки цветом и без точек */
     .subject-badge {
-      position: relative;
       width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
-      background: var(--card-2); border: 1px solid var(--line);
+      background: var(--card-2); border: 1.5px solid var(--line);
       display: flex; align-items: center; justify-content: center;
     }
     .subject-glyph { font-weight: 800; font-size: 16px; letter-spacing: -.02em; }
-    .badge-dot { position: absolute; width: 4px; height: 4px; border-radius: 50%; }
-    .badge-dot.d1 { top: 6px; right: 7px; }
-    .badge-dot.d2 { bottom: 7px; left: 8px; }
 
+    .subject-badge--ru { border-color: var(--accent); }
     .subject-badge--ru .subject-glyph { color: var(--accent); }
-    .subject-badge--ru .badge-dot { background: var(--accent); box-shadow: 0 0 4px rgba(108,108,255,.7); }
+    .subject-badge--math { border-color: var(--streak); }
     .subject-badge--math .subject-glyph { color: var(--streak); }
-    .subject-badge--math .badge-dot { background: var(--streak); box-shadow: 0 0 4px rgba(255,159,10,.7); }
+    .subject-badge--en { border-color: var(--green); }
     .subject-badge--en .subject-glyph { color: var(--green); }
-    .subject-badge--en .badge-dot { background: var(--green); box-shadow: 0 0 4px rgba(53,197,106,.7); }
 
     .subject-info { flex: 1; }
     .subject-name { font-size: 15.5px; font-weight: 700; }
@@ -316,9 +312,7 @@
     <div class="subjects">
       <div class="subject-card" data-subject="ru">
         <div class="subject-badge subject-badge--ru">
-          <span class="subject-glyph">Ё</span>
-          <span class="badge-dot d1"></span>
-          <span class="badge-dot d2"></span>
+          <span class="subject-glyph">РУ</span>
         </div>
         <div class="subject-info">
           <div class="subject-name">Русский язык</div>
@@ -330,8 +324,6 @@
       <div class="subject-card" data-subject="math">
         <div class="subject-badge subject-badge--math">
           <span class="subject-glyph">+−</span>
-          <span class="badge-dot d1"></span>
-          <span class="badge-dot d2"></span>
         </div>
         <div class="subject-info">
           <div class="subject-name">Математика</div>
@@ -343,8 +335,6 @@
       <div class="subject-card" data-subject="en">
         <div class="subject-badge subject-badge--en">
           <span class="subject-glyph">EN</span>
-          <span class="badge-dot d1"></span>
-          <span class="badge-dot d2"></span>
         </div>
         <div class="subject-info">
           <div class="subject-name">English</div>
