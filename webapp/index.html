@@ -212,9 +212,9 @@
     <div class="topbar">
       <div class="title">Прогресс</div>
       <div class="top-actions">
-        <div class="streak-chip on" id="streakChip">
+        <div class="streak-chip off" id="streakChip">
           <svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-          <span id="streakCount">7</span>
+          <span id="streakCount">0</span>
         </div>
         <button class="icon-btn" aria-label="Настройки">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -229,9 +229,9 @@
           <div class="ring-wrap">
             <svg width="52" height="52" viewBox="0 0 52 52">
               <circle cx="26" cy="26" r="22" fill="none" stroke="var(--card-2)" stroke-width="6"/>
-              <circle cx="26" cy="26" r="22" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="41.5"/>
+              <circle cx="26" cy="26" r="22" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
             </svg>
-            <div class="ring-num">3/4</div>
+            <div class="ring-num">0/4</div>
           </div>
           <div class="card-ic">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -244,7 +244,7 @@
       <!-- Карточка: слов выучено -->
       <div class="card">
         <div class="card-top">
-          <div class="card-big">128<span> слов</span></div>
+          <div class="card-big">0<span> слов</span></div>
           <div class="card-ic">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
           </div>
@@ -347,11 +347,11 @@
       document.getElementById('calMonthTitle').textContent = RU_MONTHS[month];
       document.getElementById('calDayBadge').textContent = `${day} из ${daysInMonth}`;
 
+      // Пока нет реального трекинга посещений — красим только сегодняшний день,
+      // остальные дни нейтральные (эффект "только что установленного" приложения).
       let html = '';
       for (let d = 1; d <= daysInMonth; d++) {
-        if (d === day) html += '<span class="cal-dot today"></span>';
-        else if (d < day) html += '<span class="cal-dot done"></span>';
-        else html += '<span class="cal-dot"></span>';
+        html += d === day ? '<span class="cal-dot today"></span>' : '<span class="cal-dot"></span>';
       }
       document.getElementById('calGrid').innerHTML = html;
     }
