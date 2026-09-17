@@ -119,15 +119,28 @@
       background: var(--card); border: 1px solid var(--line); border-radius: 999px;
       display: flex; justify-content: space-around; align-items: center; padding: 7px;
     }
+    /* Плавающий индикатор-«капля», скользит между вкладками вместо мгновенной смены фона */
+    .nav-pill {
+      position: absolute; top: 7px; left: 7px;
+      width: 56px; height: 48px; border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 14px rgba(108,108,255,.6), 0 3px 12px rgba(108,108,255,.35);
+      transition: transform .46s cubic-bezier(.22,1.36,.4,1);
+      will-change: transform;
+      pointer-events: none;
+      z-index: 0;
+    }
     .nav button {
+      position: relative; z-index: 1;
       background: none; border: none; color: var(--dim); cursor: pointer;
       width: 56px; height: 48px; border-radius: 999px;
       display: flex; align-items: center; justify-content: center;
-      transition: background .15s, color .15s, transform .12s;
+      transition: color .3s ease, transform .12s;
     }
     .nav button:active { transform: scale(.92); }
-    .nav button.active { background: var(--accent); color: #fff; }
-    .nav svg { width: 22px; height: 22px; }
+    .nav button.active { color: #fff; }
+    .nav svg { width: 22px; height: 22px; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+    .nav button.active svg { transform: scale(1.08); }
 
     /* --- Заглушка для второй/третьей/четвёртой вкладки --- */
     .placeholder {
@@ -306,7 +319,8 @@
   </div>
 
   <!-- ===== Нижняя навигация ===== -->
-  <nav class="nav">
+  <nav class="nav" id="nav">
+    <div class="nav-pill" id="navPill"></div>
     <button class="active" data-view="progress" aria-label="Прогресс">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8 13 13.7l-3-3L4 16.7"/></svg>
     </button>
@@ -364,9 +378,19 @@
       requestAnimationFrame(() => requestAnimationFrame(() => incoming.classList.add('in')));
     }
 
+    // Скользящая капля-индикатор под иконками навигации
+    const nav = document.getElementById('nav');
+    const navPill = document.getElementById('navPill');
+    function movePillTo(btn) {
+      navPill.style.transform = `translateX(${btn.offsetLeft - navButtons[0].offsetLeft}px)`;
+    }
+    window.addEventListener('resize', () => movePillTo(document.querySelector('.nav button.active')));
+    movePillTo(navButtons[0]);
+
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         navButtons.forEach(b => b.classList.toggle('active', b === btn));
+        movePillTo(btn);
         switchView(btn.dataset.view);
         tg?.HapticFeedback?.impactOccurred('light');
       });
