@@ -127,7 +127,7 @@
     }
     /* Плавающий индикатор-«капля», скользит между вкладками вместо мгновенной смены фона */
     .nav-pill {
-      position: absolute; top: 7px; left: 7px;
+      position: absolute; top: 7px; left: 0;
       width: 56px; height: 48px; border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 14px rgba(108,108,255,.6), 0 3px 12px rgba(108,108,255,.35);
@@ -403,7 +403,9 @@
     const nav = document.getElementById('nav');
     const navPill = document.getElementById('navPill');
     function movePillTo(btn) {
-      navPill.style.transform = `translateX(${btn.offsetLeft - navButtons[0].offsetLeft}px)`;
+      // Абсолютная позиция кнопки в системе координат nav (то же offsetParent, что у капли) —
+      // а не смещение от кнопки 0, которое не учитывало отступ space-around по краям.
+      navPill.style.transform = `translateX(${btn.offsetLeft}px)`;
     }
     function resyncPill() { movePillTo(document.querySelector('.nav button.active') || navButtons[0]); }
     window.addEventListener('resize', resyncPill);
