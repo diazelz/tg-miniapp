@@ -19,6 +19,7 @@
       --dim-2: #57575F;
       --accent: #6C6CFF;
       --streak: #FF9F0A;
+      --green: #35C56A;
       --line: #2A2A30;
     }
 
@@ -159,8 +160,26 @@
     .placeholder h3 { font-size: 18px; font-weight: 800; }
     .placeholder p { font-size: 13.5px; color: var(--dim); max-width: 240px; line-height: 1.5; }
 
-    #view-progress { display: none; }
-    #view-progress.show { display: block; }
+    /* --- Вкладка «Уроки»: список предметов --- */
+    .subjects { display: flex; flex-direction: column; gap: 12px; }
+    .subject-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+      padding: 16px; cursor: pointer; transition: transform .15s;
+    }
+    .subject-card:active { transform: scale(.98); }
+    .subject-badge {
+      width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 15px; letter-spacing: -.02em;
+    }
+    .subject-info { flex: 1; }
+    .subject-name { font-size: 15.5px; font-weight: 700; }
+    .subject-sub { font-size: 12.5px; color: var(--dim); margin-top: 2px; }
+    .subject-arrow { color: var(--dim); font-size: 20px; }
+
+    #view-progress, #view-lessons { display: none; }
+    #view-progress.show, #view-lessons.show { display: block; }
 
     /* --- Плавный переход между вкладками (opacity + сдвиг, только transform/opacity — 60fps) --- */
     .tab-view {
@@ -273,15 +292,43 @@
     </div>
   </div>
 
-  <!-- ===== Вкладки-заглушки (пока пустые) ===== -->
-  <div id="view-lessons" class="placeholder tab-view">
-    <div class="placeholder-ic">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+  <!-- ===== Вкладка 2: Уроки — разделы по предметам ===== -->
+  <div id="view-lessons" class="tab-view">
+    <div class="topbar">
+      <div class="title">Уроки</div>
     </div>
-    <h3>Уроки</h3>
-    <p>Здесь появится расписание и список занятий с репетитором</p>
+
+    <div class="subjects">
+      <div class="subject-card" data-subject="ru">
+        <div class="subject-badge" style="background: rgba(108,108,255,.15); color: var(--accent);">РУ</div>
+        <div class="subject-info">
+          <div class="subject-name">Русский язык</div>
+          <div class="subject-sub">0 уроков пройдено</div>
+        </div>
+        <div class="subject-arrow">›</div>
+      </div>
+
+      <div class="subject-card" data-subject="math">
+        <div class="subject-badge" style="background: rgba(255,159,10,.15); color: var(--streak);">π</div>
+        <div class="subject-info">
+          <div class="subject-name">Математика</div>
+          <div class="subject-sub">0 уроков пройдено</div>
+        </div>
+        <div class="subject-arrow">›</div>
+      </div>
+
+      <div class="subject-card" data-subject="en">
+        <div class="subject-badge" style="background: rgba(53,197,106,.15); color: var(--green);">EN</div>
+        <div class="subject-info">
+          <div class="subject-name">English</div>
+          <div class="subject-sub">0 уроков пройдено</div>
+        </div>
+        <div class="subject-arrow">›</div>
+      </div>
+    </div>
   </div>
 
+  <!-- ===== Вкладки-заглушки (пока пустые) ===== -->
   <div id="view-stats" class="placeholder tab-view">
     <div class="placeholder-ic">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15c2.5 0 2.5-6 5-6s2.5 8 5 8 2.5-11 5-11"/><circle cx="19" cy="6" r="1.4" fill="currentColor" stroke="none"/></svg>
@@ -413,6 +460,11 @@
       this.classList.remove('pop');
       void this.offsetWidth;
       this.classList.add('pop');
+    });
+
+    // Тактильный отклик при открытии раздела предмета (сами уроки внутри — следующим шагом)
+    document.querySelectorAll('.subject-card').forEach(card => {
+      card.addEventListener('click', () => tg?.HapticFeedback?.impactOccurred('light'));
     });
 
     // ---- Реальный трекинг времени в приложении ----
