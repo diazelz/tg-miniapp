@@ -189,6 +189,79 @@
     .subject-sub { font-size: 12.5px; color: var(--dim); margin-top: 2px; }
     .subject-arrow { color: var(--dim); font-size: 20px; }
 
+    /* --- Вложенные экраны «Уроки»: предметы → папки → разделы → упражнение --- */
+    .lessons-screen { display: none; }
+    .lessons-screen.show { display: block; animation: rise .3s cubic-bezier(.22,1,.36,1); }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .screen-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .back-btn {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: var(--card); border: 1px solid var(--line); color: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: transform .12s;
+    }
+    .back-btn:active { transform: scale(.9); }
+    .back-btn svg { width: 18px; height: 18px; }
+    .screen-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; flex: 1; }
+    .screen-sub-badge { font-size: 12px; font-weight: 700; color: var(--dim); background: var(--card-2); padding: 5px 11px; border-radius: 999px; }
+
+    /* --- Словарное упражнение: банк слов + карточка с пропусками --- */
+    .word-bank {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+      padding: 14px; margin-bottom: 16px;
+    }
+    .word-chip {
+      padding: 8px 12px; background: var(--card-2); border: 1px solid var(--line); border-radius: 11px;
+      font-size: 12.5px; font-weight: 700; color: var(--white); cursor: pointer;
+      transition: transform .15s, background .15s, border-color .15s, box-shadow .15s;
+      user-select: none; -webkit-user-select: none;
+    }
+    .word-chip:active { transform: scale(.94); }
+    .word-chip.selected {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 0 10px rgba(108,108,255,.55); transform: scale(1.05);
+    }
+    .word-chip.used { display: none; }
+    .word-chip.shake { animation: chipShake .4s; }
+    @keyframes chipShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .vocab-stage { position: relative; min-height: 220px; }
+    .vocab-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 22px;
+      transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .4s cubic-bezier(.22,1,.36,1);
+    }
+    .vocab-card.leaving { transform: translateX(-120%); opacity: 0; }
+    .vocab-card.entering { transform: translateX(120%); opacity: 0; }
+    .vocab-num { font-size: 12px; font-weight: 800; color: var(--accent); margin-bottom: 10px; letter-spacing: .02em; }
+    .vocab-text { font-size: 15.5px; line-height: 1.85; color: var(--white); }
+    .vocab-blank {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 84px; padding: 3px 10px; margin: 0 2px; border-radius: 8px;
+      border-bottom: 2px solid var(--dim-2);
+      font-weight: 700; font-size: 14px; color: var(--dim-2); cursor: pointer;
+      transition: all .18s;
+    }
+    .vocab-blank.filled { border-bottom-color: var(--accent); color: var(--white); background: rgba(108,108,255,.12); }
+    .vocab-blank.wrong { border-bottom-color: #FF5C5C; background: rgba(255,92,92,.15); color: #FF5C5C; animation: chipShake .4s; }
+
+    .vocab-done {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; gap: 10px; min-height: 260px;
+    }
+    .vocab-done-ic {
+      width: 64px; height: 64px; border-radius: 50%; background: var(--card);
+      border: 1.5px solid var(--accent); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vocab-done-ic svg { width: 28px; height: 28px; }
+    .vocab-done h3 { font-size: 18px; font-weight: 800; }
+    .vocab-done p { font-size: 13.5px; color: var(--dim); }
+
     #view-progress, #view-lessons { display: none; }
     #view-progress.show, #view-lessons.show { display: block; }
 
@@ -309,6 +382,7 @@
       <div class="title">Уроки</div>
     </div>
 
+    <div class="lessons-screen show" id="screenSubjects">
     <div class="subjects">
       <div class="subject-card" data-subject="ru">
         <div class="subject-badge subject-badge--ru">
@@ -332,7 +406,7 @@
         <div class="subject-arrow">›</div>
       </div>
 
-      <div class="subject-card" data-subject="en">
+      <div class="subject-card" data-subject="en" data-open="screenEnFolders">
         <div class="subject-badge subject-badge--en">
           <span class="subject-glyph">EN</span>
         </div>
@@ -342,6 +416,86 @@
         </div>
         <div class="subject-arrow">›</div>
       </div>
+    </div>
+    </div>
+
+    <!-- Экран: папки English (ЕГЭ / TOEFL) -->
+    <div class="lessons-screen" id="screenEnFolders">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenSubjects" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">English</div>
+      </div>
+      <div class="subjects">
+        <div class="subject-card" data-open="screenEge">
+          <div class="subject-badge subject-badge--en"><span class="subject-glyph">ЕГЭ</span></div>
+          <div class="subject-info">
+            <div class="subject-name">ЕГЭ</div>
+            <div class="subject-sub">Скоро появится</div>
+          </div>
+          <div class="subject-arrow">›</div>
+        </div>
+        <div class="subject-card" data-open="screenToefl">
+          <div class="subject-badge subject-badge--en"><span class="subject-glyph">TF</span></div>
+          <div class="subject-info">
+            <div class="subject-name">TOEFL</div>
+            <div class="subject-sub">1 раздел</div>
+          </div>
+          <div class="subject-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Экран: разделы ЕГЭ (пока пусто) -->
+    <div class="lessons-screen" id="screenEge">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenEnFolders" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">ЕГЭ</div>
+      </div>
+      <div class="placeholder" style="display:flex; min-height:40vh;">
+        <div class="placeholder-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <h3>Скоро появится</h3>
+        <p>Задания по ЕГЭ добавим следующим шагом</p>
+      </div>
+    </div>
+
+    <!-- Экран: разделы TOEFL -->
+    <div class="lessons-screen" id="screenToefl">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenEnFolders" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">TOEFL</div>
+      </div>
+      <div class="subjects">
+        <div class="subject-card" data-open="screenVocab">
+          <div class="subject-badge subject-badge--en"><span class="subject-glyph">Aa</span></div>
+          <div class="subject-info">
+            <div class="subject-name">Лексика</div>
+            <div class="subject-sub">18 заданий</div>
+          </div>
+          <div class="subject-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Экран: упражнение «Лексика» — банк слов + карточки с пропусками -->
+    <div class="lessons-screen" id="screenVocab">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenToefl" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">Лексика</div>
+        <div class="screen-sub-badge" id="vocabProgress">1/18</div>
+      </div>
+
+      <div class="word-bank" id="wordBank"></div>
+      <div class="vocab-stage" id="vocabStage"></div>
     </div>
   </div>
 
@@ -479,10 +633,179 @@
       this.classList.add('pop');
     });
 
-    // Тактильный отклик при открытии раздела предмета (сами уроки внутри — следующим шагом)
-    document.querySelectorAll('.subject-card').forEach(card => {
-      card.addEventListener('click', () => tg?.HapticFeedback?.impactOccurred('light'));
+    // ---- Навигация между вложенными экранами вкладки «Уроки» ----
+    // (предметы → папки English → разделы TOEFL → упражнение «Лексика»)
+    document.querySelectorAll('#view-lessons [data-open]').forEach(card => {
+      card.addEventListener('click', () => {
+        tg?.HapticFeedback?.impactOccurred('light');
+        const target = document.getElementById(card.dataset.open);
+        document.querySelectorAll('#view-lessons .lessons-screen.show').forEach(s => s.classList.remove('show'));
+        target.classList.add('show');
+        if (card.dataset.open === 'screenVocab') startVocabExercise();
+      });
     });
+    document.querySelectorAll('#view-lessons [data-back]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tg?.HapticFeedback?.impactOccurred('light');
+        const target = document.getElementById(btn.dataset.back);
+        document.querySelectorAll('#view-lessons .lessons-screen.show').forEach(s => s.classList.remove('show'));
+        target.classList.add('show');
+      });
+    });
+
+    // ---- Упражнение «Лексика» (TOEFL): банк слов + карточки с пропусками ----
+    // Слова размечены по значению — распредели их по предложениям ниже.
+    const VOCAB_ITEMS = [
+      { parts: ['', ' — это период жизни между детством и взрослостью, а тот, кто его проходит, называется ', '.'],
+        blanks: [['adolescence'], ['adolescent']] },
+      { parts: ['Человека, не достигшего возраста, с которого начинаются права и обязанности взрослого, называют ', '.'],
+        blanks: [['minor']] },
+      { parts: ['Слово ', ' обозначает твоих братьев и сестёр вместе.'],
+        blanks: [['siblings']] },
+      { parts: ['Супруги, которые больше не живут вместе, но официально ещё в браке — ', '. Когда суд полностью прекращает брак, они уже ', '.'],
+        blanks: [['separated'], ['divorced']] },
+      { parts: ['Семья, которая берёт ребёнка на длительное время без официального усыновления — это ', '. Сам ребёнок в такой семье — ', ', а глагол, описывающий это — ', '.'],
+        blanks: [['foster family'], ['foster child'], ['foster']] },
+      { parts: ['Официальным словом для молодого человека (в том числе в контексте правонарушений) служит ', '.'],
+        blanks: [['juvenile']] },
+      { parts: ['Ребёнка, который спокойно справляется с трудностями, называют ', ', а того, кто отказывается слушаться и нарушает правила — ', '.'],
+        blanks: [['well-adjusted'], ['rebellious']] },
+      { parts: ['', ' — это ранние годы жизни, которые сильнее всего формируют характер и взгляды человека.'],
+        blanks: [['formative years']] },
+      { parts: ['Официально принять чужого ребёнка в свою семью как родного — значит ', ' его.'],
+        blanks: [['adopt']] },
+      { parts: ['Молодого человека примерно от 13 до 19 лет называют ', '.'],
+        blanks: [['teenager']] },
+      { parts: ['Совсем маленького ребёнка или младенца называют ', '; этот ранний период жизни — ', '.'],
+        blanks: [['infant'], ['infancy']] },
+      { parts: ['Заботиться о ребёнке и воспитывать его — значит ', ' или ', ' его.'],
+        blanks: [['bring up', 'raise'], ['bring up', 'raise']] },
+      { parts: ['', ' семья включает бабушек, дедушек и других родственников, живущих рядом, а ', ' семья — это только родители и дети.'],
+        blanks: [['extended'], ['nuclear']] },
+      { parts: ['Родителей, которые строго следят за правилами, называют ', ' или ', '; тех, кто даёт много свободы — ', '; а тех, кто слишком опекает и волнуется — ', '.'],
+        blanks: [['strict', 'authoritarian'], ['strict', 'authoritarian'], ['lenient'], ['over-protective']] },
+      { parts: ['Человека, который полагается на заботу и поддержку другого (часто родственника), называют его ', '.'],
+        blanks: [['dependent']] },
+      { parts: ['', ' — это то, как родители растят и воспитывают своих детей.'],
+        blanks: [['upbringing']] },
+      { parts: ['Семью, где ребёнка растит только один родитель, называют ', ' семьёй.'],
+        blanks: [['single-parent']] },
+      { parts: ['Родителя, который надёжно заботится о ребёнке — питание, учёба, здоровье — называют ', ' родителем.'],
+        blanks: [['responsible']] },
+    ];
+
+    const VOCAB_WORDS = ['adolescence','adolescent','minor','siblings','separated','divorced',
+      'foster family','foster child','foster','juvenile','well-adjusted','rebellious','formative years',
+      'adopt','teenager','infant','infancy','bring up','raise','extended','nuclear','strict',
+      'authoritarian','lenient','over-protective','dependent','upbringing','single-parent','responsible'];
+
+    let vocabStarted = false;
+    let vocabIndex = 0;
+    let vocabSelectedWord = null;
+    const vocabWordUsed = {}; // слово -> навсегда использовано (правильно вставлено)
+
+    function startVocabExercise() {
+      if (vocabStarted) return;
+      vocabStarted = true;
+      VOCAB_WORDS.forEach(w => { vocabWordUsed[w] = false; });
+      renderWordBank();
+      renderVocabCard(vocabIndex, null);
+    }
+
+    function renderWordBank() {
+      const bank = document.getElementById('wordBank');
+      bank.innerHTML = VOCAB_WORDS.map(w =>
+        `<span class="word-chip${vocabWordUsed[w] ? ' used' : ''}" data-word="${w}">${w}</span>`
+      ).join('');
+      bank.querySelectorAll('.word-chip').forEach(chip => {
+        chip.addEventListener('click', () => onWordChipClick(chip));
+      });
+    }
+
+    function onWordChipClick(chip) {
+      if (chip.classList.contains('used')) return;
+      tg?.HapticFeedback?.impactOccurred('light');
+      const already = document.querySelector('.word-chip.selected');
+      if (already) already.classList.remove('selected');
+      if (already === chip) { vocabSelectedWord = null; return; }
+      chip.classList.add('selected');
+      vocabSelectedWord = chip.dataset.word;
+    }
+
+    function renderVocabCard(idx, direction) {
+      const stage = document.getElementById('vocabStage');
+      document.getElementById('vocabProgress').textContent = `${idx + 1}/${VOCAB_ITEMS.length}`;
+
+      if (idx >= VOCAB_ITEMS.length) {
+        stage.innerHTML = `
+          <div class="vocab-done">
+            <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <h3>Раздел пройден!</h3>
+            <p>Все 18 заданий по лексике выполнены верно</p>
+          </div>`;
+        document.getElementById('vocabProgress').textContent = `${VOCAB_ITEMS.length}/${VOCAB_ITEMS.length}`;
+        return;
+      }
+
+      const item = VOCAB_ITEMS[idx];
+      const filled = item.blanks.map(() => null);
+
+      function buildCardHTML() {
+        let html = `<div class="vocab-card${direction === 'in' ? ' entering' : ''}" id="curVocabCard"><div class="vocab-num">Задание ${idx + 1}</div><div class="vocab-text">`;
+        item.parts.forEach((text, i) => {
+          html += text;
+          if (i < item.blanks.length) {
+            const val = filled[i];
+            html += `<span class="vocab-blank${val ? ' filled' : ''}" data-blank="${i}">${val || '_____'}</span>`;
+          }
+        });
+        html += '</div></div>';
+        return html;
+      }
+
+      stage.innerHTML = buildCardHTML();
+      const card = document.getElementById('curVocabCard');
+      if (direction === 'in') {
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('entering')));
+      }
+
+      card.querySelectorAll('.vocab-blank').forEach(blankEl => {
+        blankEl.addEventListener('click', () => {
+          const bi = +blankEl.dataset.blank;
+          if (filled[bi]) return; // уже заполнено верно
+          if (!vocabSelectedWord) { tg?.HapticFeedback?.impactOccurred('light'); return; }
+
+          const accepted = item.blanks[bi];
+          const usedInThisCard = filled.filter(Boolean);
+          const validNow = accepted.includes(vocabSelectedWord) && !usedInThisCard.includes(vocabSelectedWord);
+
+          if (validNow) {
+            filled[bi] = vocabSelectedWord;
+            vocabWordUsed[vocabSelectedWord] = true;
+            blankEl.textContent = vocabSelectedWord;
+            blankEl.classList.add('filled');
+            tg?.HapticFeedback?.notificationOccurred('success');
+            renderWordBank();
+            vocabSelectedWord = null;
+
+            if (filled.every(Boolean)) {
+              setTimeout(() => {
+                card.classList.add('leaving');
+                setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 380);
+              }, 450);
+            }
+          } else {
+            blankEl.classList.add('wrong');
+            tg?.HapticFeedback?.notificationOccurred('error');
+            const chip = document.querySelector(`.word-chip[data-word="${CSS.escape(vocabSelectedWord)}"]`);
+            chip?.classList.add('shake');
+            chip?.classList.remove('selected');
+            vocabSelectedWord = null;
+            setTimeout(() => { blankEl.classList.remove('wrong'); chip?.classList.remove('shake'); }, 450);
+          }
+        });
+      });
+    }
 
     // ---- Реальный трекинг времени в приложении ----
     // Копим секунды, пока страница видима, и сохраняем в localStorage по дате.
