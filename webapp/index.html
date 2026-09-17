@@ -288,13 +288,13 @@
         </div>
       </div>
 
-      <!-- Полоса: время обучения -->
+      <!-- Полоса: время обучения (реальный трекинг, накапливается по дням) -->
       <div class="card stat-row">
         <div>
           <div class="stat-row-label">Время обучения</div>
-          <div class="stat-row-sub">Последние 7 дней</div>
+          <div class="stat-row-sub" id="studyTimeSub">Сегодня</div>
         </div>
-        <div class="stat-row-val">4<span> ч 20 мин</span></div>
+        <div class="stat-row-val" id="studyTimeVal">0<span> мин</span></div>
       </div>
     </div>
   </div>
@@ -414,6 +414,65 @@
       void this.offsetWidth;
       this.classList.add('pop');
     });
+
+    // ---- Реальный трекинг времени в приложении ----
+    // Копим секунды, пока страница видима, и сохраняем в localStorage по дате.
+    // Так при выходе и повторном заходе (даже в другой день) счётчик не теряется —
+    // просто продолжает копиться на сегодняшнюю дату.
+    (function studyTimeTracker() {
+      const dayKey = () => 'tutor_study_' + new Date().toISOString().slice(0, 10);
+
+      function loadSeconds() {
+        try { return parseInt(localStorage.getItem(dayKey()), 10) || 0; } catch (e) { return 0; }
+      }
+      function saveSeconds(sec) {
+        try { localStorage.setItem(dayKey(), String(sec)); } catch (e) {}
+      }
+
+      let baseSeconds = loadSeconds();
+      let sessionStart = document.visibilityState === 'visible' ? Date.now() : null;
+
+      function totalSeconds() {
+        const extra = sessionStart ? Math.floor((Date.now() - sessionStart) / 1000) : 0;
+        return baseSeconds + extra;
+      }
+
+      // Переносим накопленное с момента последнего flush в baseSeconds и сохраняем.
+      function flush() {
+        if (sessionStart) {
+          baseSeconds += Math.floor((Date.now() - sessionStart) / 1000);
+          sessionStart = Date.now();
+        }
+        saveSeconds(baseSeconds);
+      }
+
+      function render() {
+        const valEl = document.getElementById('studyTimeVal');
+        if (!valEl) return;
+        const total = totalSeconds();
+        const h = Math.floor(total / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        valEl.innerHTML = h > 0
+          ? h + '<span> ч ' + m + ' мин</span>'
+          : m + '<span> мин</span>';
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          flush();
+          sessionStart = null;
+        } else {
+          baseSeconds = loadSeconds(); // подхватываем смену дня, если приложение простаивало
+          sessionStart = Date.now();
+        }
+      });
+      window.addEventListener('pagehide', flush);
+      window.addEventListener('beforeunload', flush);
+
+      setInterval(render, 1000);   // живой тик на экране
+      setInterval(flush, 5000);    // периодическое сохранение на случай резкого закрытия
+      render();
+    })();
   </script>
 </body>
 </html>
