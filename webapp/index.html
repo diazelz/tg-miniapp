@@ -149,13 +149,53 @@
     #view-progress { display: none; }
     #view-progress.show { display: block; }
 
+    /* --- Плавный переход между вкладками (opacity + сдвиг, только transform/opacity — 60fps) --- */
+    .tab-view {
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .3s cubic-bezier(.22,1,.36,1), transform .3s cubic-bezier(.22,1,.36,1);
+      will-change: opacity, transform;
+    }
+    .tab-view.in { opacity: 1; transform: translateY(0); }
+
+    /* --- Сплэш-лоадер при запуске (кольцо с плавным хвостом, наша палитра) --- */
+    .splash {
+      position: fixed; inset: 0; z-index: 300;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .4s ease, visibility .4s;
+    }
+    .splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0deg, var(--accent) 300deg, var(--accent) 360deg);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px));
+      animation: spin .85s linear infinite;
+      will-change: transform;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Микро-анимация стрик-чипа при обновлении --- */
+    @keyframes streakPop {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.16); }
+      100% { transform: scale(1); }
+    }
+    .streak-chip.pop { animation: streakPop .38s cubic-bezier(.34,1.56,.64,1); }
+
     @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
 
+  <!-- ===== Сплэш-лоадер ===== -->
+  <div class="splash" id="splash">
+    <div class="spinner"></div>
+  </div>
+
   <!-- ===== Вкладка 1: Прогресс ===== -->
-  <div id="view-progress" class="show">
+  <div id="view-progress" class="tab-view show in">
     <div class="topbar">
       <div class="title">Прогресс</div>
       <div class="top-actions">
@@ -241,7 +281,7 @@
   </div>
 
   <!-- ===== Вкладки-заглушки (пока пустые) ===== -->
-  <div id="view-lessons" class="placeholder">
+  <div id="view-lessons" class="placeholder tab-view">
     <div class="placeholder-ic">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
     </div>
@@ -249,7 +289,7 @@
     <p>Здесь появится расписание и список занятий с репетитором</p>
   </div>
 
-  <div id="view-stats" class="placeholder">
+  <div id="view-stats" class="placeholder tab-view">
     <div class="placeholder-ic">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8 13 13.7l-3-3L4 16.7"/></svg>
     </div>
@@ -257,7 +297,7 @@
     <p>Здесь будет подробная динамика прогресса</p>
   </div>
 
-  <div id="view-chat" class="placeholder">
+  <div id="view-chat" class="placeholder tab-view">
     <div class="placeholder-ic">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
@@ -289,6 +329,10 @@
       try { tg.setHeaderColor("#0B0B0D"); tg.setBackgroundColor("#0B0B0D"); } catch (e) {}
     }
 
+    // Сплэш-лоадер: держим по минимуму, чтобы не мигал на быстрой сети,
+    // но и не задерживал интерфейс дольше необходимого
+    setTimeout(() => document.getElementById('splash').classList.add('hide'), 550);
+
     // Рисуем точки стрик-календаря из data-days ("1" = занимался, "t" = сегодня, "0" = пропуск)
     document.querySelectorAll('.cal-grid').forEach(grid => {
       const days = grid.dataset.days.split(',');
@@ -304,20 +348,36 @@
     ['lessons', 'stats', 'chat'].forEach(id => views[id] = document.getElementById('view-' + id));
     const navButtons = document.querySelectorAll('.nav button');
 
+    let activeView = 'progress';
+    function switchView(target) {
+      if (target === activeView) return;
+      const incoming = views[target];
+      const outgoing = views[activeView];
+      activeView = target;
+
+      // Скрываемая вкладка: сначала плавно гасим, потом убираем из потока
+      outgoing.classList.remove('in');
+      setTimeout(() => outgoing.classList.remove('show'), 300);
+
+      // Появляющаяся вкладка: включаем в поток, затем на следующем кадре проявляем
+      incoming.classList.add('show');
+      requestAnimationFrame(() => requestAnimationFrame(() => incoming.classList.add('in')));
+    }
+
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const target = btn.dataset.view;
         navButtons.forEach(b => b.classList.toggle('active', b === btn));
-        Object.entries(views).forEach(([key, el]) => {
-          el.classList.toggle('show', key === target);
-        });
+        switchView(btn.dataset.view);
         tg?.HapticFeedback?.impactOccurred('light');
       });
     });
 
-    // Клик по стрик-молнии — небольшая обратная связь (логику стриков добавим позже)
-    document.getElementById('streakChip').addEventListener('click', () => {
+    // Клик по стрик-молнии — лёгкий "поп" и тактильный отклик (логику стриков добавим позже)
+    document.getElementById('streakChip').addEventListener('click', function () {
       tg?.HapticFeedback?.impactOccurred('light');
+      this.classList.remove('pop');
+      void this.offsetWidth;
+      this.classList.add('pop');
     });
   </script>
 </body>
