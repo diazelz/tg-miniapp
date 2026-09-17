@@ -78,15 +78,28 @@
     .card-label { font-size: 14px; font-weight: 700; margin-top: 14px; }
     .card-sub { font-size: 12.5px; color: var(--dim); margin-top: 2px; }
 
-    /* --- Календарь стриков --- */
+    /* --- Календарь стриков (текущий месяц, реальная дата по МСК) --- */
     .cal-card { grid-column: 1 / -1; margin-top: 12px; padding: 20px 18px 16px; }
-    .cal-months { display: flex; justify-content: space-between; gap: 14px; }
-    .cal-month { flex: 1; text-align: center; }
-    .cal-month-name { font-size: 12.5px; font-weight: 700; color: var(--dim); margin-bottom: 10px; }
-    .cal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; justify-items: center; }
-    .cal-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-title { font-size: 15.5px; font-weight: 800; letter-spacing: -0.01em; }
+    .cal-day-badge { font-size: 12px; font-weight: 700; color: var(--dim); background: var(--card-2); padding: 5px 11px; border-radius: 999px; }
+    .cal-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 9px 6px; justify-items: center; }
+    .cal-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); transition: transform .15s; }
     .cal-dot.done { background: var(--streak); box-shadow: 0 0 5px rgba(255,159,10,.6); }
-    .cal-dot.today { background: var(--accent); box-shadow: 0 0 6px rgba(108,108,255,.7); }
+    .cal-dot.today {
+      width: 12px; height: 12px; background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,108,255,.18), 0 0 8px rgba(108,108,255,.8);
+      animation: todayPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes todayPulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(108,108,255,.18), 0 0 8px rgba(108,108,255,.8); }
+      50% { box-shadow: 0 0 0 5px rgba(108,108,255,.1), 0 0 12px rgba(108,108,255,1); }
+    }
+    .cal-legend { display: flex; gap: 18px; margin-top: 14px; }
+    .cal-legend span { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--dim); font-weight: 600; }
+    .cal-legend i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cal-legend i.done { background: var(--streak); box-shadow: 0 0 5px rgba(255,159,10,.6); }
+    .cal-legend i.today { background: var(--accent); box-shadow: 0 0 5px rgba(108,108,255,.8); }
 
     .cal-divider { height: 1px; background: var(--line); margin: 18px 0 14px; }
 
@@ -259,21 +272,16 @@
         <div class="card-sub">за последние 30 дней</div>
       </div>
 
-      <!-- Широкая карточка: календарь стриков + следующий урок -->
+      <!-- Широкая карточка: календарь стриков (текущий месяц) + следующий урок -->
       <div class="card cal-card">
-        <div class="cal-months">
-          <div class="cal-month">
-            <div class="cal-month-name">Янв</div>
-            <div class="cal-grid" data-days="1,1,1,1,1,0,1,1,0,1,1,1,1,0,1"></div>
-          </div>
-          <div class="cal-month">
-            <div class="cal-month-name">Фев</div>
-            <div class="cal-grid" data-days="1,0,1,1,0,1,0,1,1,1,0,1,1,0,0"></div>
-          </div>
-          <div class="cal-month">
-            <div class="cal-month-name">Мар</div>
-            <div class="cal-grid" data-days="1,1,t,0,0,0,0,0,0,0,0,0,0,0,0"></div>
-          </div>
+        <div class="cal-header">
+          <div class="cal-title" id="calMonthTitle">—</div>
+          <div class="cal-day-badge" id="calDayBadge">—</div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <span><i class="done"></i>Пройдено</span>
+          <span><i class="today"></i>Сегодня</span>
         </div>
 
         <div class="cal-divider"></div>
@@ -354,14 +362,40 @@
     // но и не задерживал интерфейс дольше необходимого
     setTimeout(() => document.getElementById('splash').classList.add('hide'), 550);
 
-    // Рисуем точки стрик-календаря из data-days ("1" = занимался, "t" = сегодня, "0" = пропуск)
-    document.querySelectorAll('.cal-grid').forEach(grid => {
-      const days = grid.dataset.days.split(',');
-      grid.innerHTML = days.map(d => {
-        if (d === 't') return '<span class="cal-dot today"></span>';
-        if (d === '1') return '<span class="cal-dot done"></span>';
-        return '<span class="cal-dot"></span>';
-      }).join('');
+    // ---- Календарь стриков: реальный текущий месяц, смена дня — по МСК ----
+    const RU_MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+    function getMskDate() {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Moscow', year: 'numeric', month: 'numeric', day: 'numeric'
+      }).formatToParts(new Date());
+      const p = {};
+      parts.forEach(({ type, value }) => { if (type !== 'literal') p[type] = parseInt(value, 10); });
+      return { year: p.year, month: p.month - 1, day: p.day }; // month: 0-11
+    }
+
+    function renderCalendar() {
+      const { year, month, day } = getMskDate();
+      const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+
+      document.getElementById('calMonthTitle').textContent = RU_MONTHS[month];
+      document.getElementById('calDayBadge').textContent = `${day} из ${daysInMonth}`;
+
+      let html = '';
+      for (let d = 1; d <= daysInMonth; d++) {
+        if (d === day) html += '<span class="cal-dot today"></span>';
+        else if (d < day) html += '<span class="cal-dot done"></span>';
+        else html += '<span class="cal-dot"></span>';
+      }
+      document.getElementById('calGrid').innerHTML = html;
+    }
+
+    renderCalendar();
+    // На случай, если вкладка была открыта весь день — досчитываем смену дня по МСК каждый час,
+    // и сразу же при возврате в приложение (visibilitychange), не дожидаясь таймера.
+    setInterval(renderCalendar, 60 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') renderCalendar();
     });
 
     // Переключение вкладок снизу
