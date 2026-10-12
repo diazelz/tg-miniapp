@@ -287,6 +287,12 @@
     .answer-fb { font-size: 12.5px; margin-top: 8px; min-height: 16px; font-weight: 700; }
     .answer-fb.ok { color: var(--accent); }
     .answer-fb.bad { color: #FF5C5C; }
+    .skip-btn {
+      display: block; margin: 10px auto 0; background: none; border: none;
+      color: var(--dim); font-size: 12.5px; font-weight: 700; cursor: pointer;
+      padding: 6px 10px; transition: color .15s;
+    }
+    .skip-btn:active { color: var(--white); }
 
     #view-progress, #view-lessons { display: none; }
     #view-progress.show, #view-lessons.show { display: block; }
@@ -829,7 +835,7 @@
             html += `<span class="vocab-blank${val ? ' filled' : ''}" data-blank="${i}">${val || '_____'}</span>`;
           }
         });
-        html += '</div></div>';
+        html += '</div><button class="skip-btn" id="vocabSkipBtn">Пропустить задание →</button></div>';
         return html;
       }
 
@@ -874,6 +880,12 @@
             setTimeout(() => { blankEl.classList.remove('wrong'); chip?.classList.remove('shake'); }, 450);
           }
         });
+      });
+
+      document.getElementById('vocabSkipBtn').addEventListener('click', () => {
+        tg?.HapticFeedback?.impactOccurred('light');
+        card.classList.add('leaving');
+        setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 380);
       });
     }
 
@@ -1014,6 +1026,7 @@
             <button class="answer-btn" id="mathAnswerBtn">Ответить</button>
           </div>
           <div class="answer-fb" id="mathAnswerFb"></div>
+          <button class="skip-btn" id="mathSkipBtn">Пропустить задание →</button>
         </div>`;
 
       const card = document.getElementById('curMathCard');
@@ -1053,6 +1066,12 @@
 
       btn.addEventListener('click', submit);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+
+      document.getElementById('mathSkipBtn').addEventListener('click', () => {
+        tg?.HapticFeedback?.impactOccurred('light');
+        card.classList.add('leaving');
+        setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 380);
+      });
     }
 
     // ---- Реальный трекинг времени в приложении ----
