@@ -454,24 +454,35 @@
         <div class="screen-title">Математика</div>
       </div>
       <div class="subjects">
-        <div class="subject-card" data-open="screenMathEge">
+        <div class="subject-card" data-open="screenMathVariants">
           <div class="subject-badge subject-badge--math"><span class="subject-glyph">ЕГЭ</span></div>
           <div class="subject-info">
             <div class="subject-name">ЕГЭ</div>
-            <div class="subject-sub">12 заданий · вариант 1</div>
+            <div class="subject-sub">4 варианта · по 12 заданий</div>
           </div>
           <div class="subject-arrow">›</div>
         </div>
       </div>
     </div>
 
-    <!-- Экран: задания ЕГЭ по математике (1–12, профильный уровень) -->
-    <div class="lessons-screen" id="screenMathEge">
+    <!-- Экран: выбор варианта ЕГЭ -->
+    <div class="lessons-screen" id="screenMathVariants">
       <div class="screen-header">
         <button class="back-btn" data-back="screenMathFolders" aria-label="Назад">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="screen-title">ЕГЭ</div>
+      </div>
+      <div class="subjects" id="variantList"></div>
+    </div>
+
+    <!-- Экран: задания ЕГЭ по математике (1–12, профильный уровень) -->
+    <div class="lessons-screen" id="screenMathEge">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenMathVariants" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title" id="mathEgeTitle">ЕГЭ</div>
         <div class="screen-sub-badge" id="mathProgress">1/12</div>
       </div>
       <div class="vocab-stage" id="mathStage"></div>
@@ -700,7 +711,7 @@
         document.querySelectorAll('#view-lessons .lessons-screen.show').forEach(s => s.classList.remove('show'));
         target.classList.add('show');
         if (card.dataset.open === 'screenVocab') startVocabExercise();
-        if (card.dataset.open === 'screenMathEge') startMathExercise();
+        if (card.dataset.open === 'screenMathVariants') renderVariantList();
       });
     });
     document.querySelectorAll('#view-lessons [data-back]').forEach(btn => {
@@ -866,78 +877,110 @@
       });
     }
 
-    // ---- Задания ЕГЭ по математике (профильный уровень, 1–12) ----
-    // Текст заданий и ответы — по варианту, который прислал пользователь (открытый банк ФИПИ).
+    // ---- Задания ЕГЭ по математике (профильный уровень, 1–12), 4 варианта ----
+    // Текст заданий и ответы — по вариантам, которые прислал пользователь (открытый банк ФИПИ).
     // Чертежи — свои SVG-иллюстрации под палитру приложения, не копии оригинальных рисунков.
-    const MATH_ITEMS = [
-      {
-        text: 'В треугольнике ABC угол C равен 90°, CH — высота, AB = 13, tgA = 1/5. Найдите AH.',
-        diagram: '<img src="images/math/task1_triangle.png" alt="Треугольник ABC с высотой CH" />',
-        answers: ['12.5']
-      },
-      {
-        text: 'Две стороны прямоугольника ABCD равны 6 и 8. Диагонали пересекаются в точке O. Найдите длину разности векторов AO и DO.',
-        diagram: '<img src="images/math/task2_rect.png" alt="Прямоугольник ABCD с диагоналями" />',
-        answers: ['8']
-      },
-      {
-        text: 'Объём параллелепипеда ABCDA₁B₁C₁D₁ равен 4,5. Найдите объём треугольной пирамиды AD₁CB₁.',
-        diagram: '<img src="images/math/task3_parallelepiped.png" alt="Параллелепипед ABCDA1B1C1D1 с пирамидой AD1CB1" />',
-        answers: ['1.5']
-      },
-      {
-        text: 'В соревновании по биатлону участвуют спортсмены из 25 стран, одна из которых — Россия. Всего на старт вышло 60 участников, из которых 6 — из России. Порядок старта определяется жребием. Какова вероятность того, что десятым стартовал спортсмен из России?',
-        diagram: null,
-        answers: ['0.1']
-      },
-      {
-        text: 'В кармане у Пети было 2 монеты по 5 рублей и 4 монеты по 10 рублей. Петя не глядя переложил какие-то 3 монеты в другой карман. Найдите вероятность того, что пятирублёвые монеты лежат теперь в разных карманах.',
-        diagram: null,
-        answers: ['0.6']
-      },
-      {
-        text: 'Монету подбрасывают 6 раз. Найдите математическое ожидание количества выпавших орлов.',
-        diagram: null,
-        answers: ['3']
-      },
-      {
-        text: 'Найдите корни уравнения cos(π(x−7)/3) = 1/2. В ответ запишите наибольший отрицательный корень.',
-        diagram: null,
-        answers: ['-4']
-      },
-      {
-        text: 'Найдите p(x) + p(6−x), если p(x) = x(6−x)/(x−3) при x ≠ 3.',
-        diagram: null,
-        answers: ['0']
-      },
-      {
-        text: 'На рисунке изображён график функции y = f(x). Прямая, проходящая через начало координат, касается графика в точке с абсциссой 8. Найдите f′(8).',
-        diagram: '<img src="images/math/task9_graph.png" alt="График функции y=f(x) с касательной из начала координат" />',
-        answers: ['1.25']
-      },
-      {
-        text: 'При температуре 0°C рельс имеет длину l₀ = 10 м. Длина при нагреве меняется по закону l(t) = l₀(1 + α·t), где α = 1,2·10⁻⁵ (°C)⁻¹. При какой температуре рельс удлинится на 3 мм? Ответ в °C.',
-        diagram: null,
-        answers: ['25']
-      },
-      {
-        text: 'Первый велосипедист выехал из посёлка со скоростью 15 км/ч. Через час после него со скоростью 10 км/ч выехал второй велосипедист, а ещё через час — третий. Найдите скорость третьего велосипедиста, если сначала он догнал второго, а через 2 ч 20 мин после этого догнал первого. Ответ в км/ч.',
-        diagram: null,
-        answers: ['25']
-      },
-      {
-        text: 'На рисунке изображён график функции f(x) = kx + b. Найдите f(−5).',
-        diagram: '<img src="images/math/task12_graph.png" alt="График линейной функции f(x)=kx+b" />',
-        answers: ['-10']
-      }
-    ];
+    const SVG = {
+      triangleH: '<svg viewBox="0 0 220 130" width="220" height="130"><polyline points="20,110 200,110 150,20 20,110" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="150" y1="20" x2="150" y2="110" style="stroke:#6C6CFF;stroke-width:2;stroke-dasharray:4 3"/><text x="8" y="126" fill="#8E8E96" font-size="13">A</text><text x="202" y="126" fill="#8E8E96" font-size="13">B</text><text x="146" y="15" fill="#8E8E96" font-size="13">C</text><text x="154" y="126" fill="#6C6CFF" font-size="13">H</text></svg>',
+      rectDiag: '<svg viewBox="0 0 200 140" width="200" height="140"><rect x="20" y="20" width="160" height="100" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="20" y1="20" x2="180" y2="120" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="20" x2="20" y2="120" style="stroke:#57575F;stroke-width:1.5"/><circle cx="100" cy="70" r="3" fill="#6C6CFF"/><text x="6" y="16" fill="#8E8E96" font-size="13">B</text><text x="184" y="16" fill="#8E8E96" font-size="13">C</text><text x="6" y="134" fill="#8E8E96" font-size="13">A</text><text x="184" y="134" fill="#8E8E96" font-size="13">D</text><text x="106" y="64" fill="#6C6CFF" font-size="13">O</text></svg>',
+      rectVec: '<svg viewBox="0 0 200 140" width="200" height="140"><rect x="20" y="20" width="160" height="100" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="20" y1="120" x2="180" y2="20" style="stroke:#6C6CFF;stroke-width:2"/><text x="6" y="16" fill="#8E8E96" font-size="13">B</text><text x="184" y="16" fill="#8E8E96" font-size="13">C</text><text x="6" y="134" fill="#8E8E96" font-size="13">A</text><text x="184" y="134" fill="#8E8E96" font-size="13">D</text></svg>',
+      parallelepiped: '<svg viewBox="0 0 220 160" width="220" height="160"><polygon points="30,130 150,130 180,100 60,100" fill="none" style="stroke:#57575F;stroke-width:1.5"/><polygon points="30,50 150,50 180,20 60,20" fill="none" style="stroke:#57575F;stroke-width:1.5"/><line x1="30" y1="130" x2="30" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="150" y1="130" x2="150" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="100" x2="180" y2="20" style="stroke:#57575F;stroke-width:1.5"/><line x1="60" y1="100" x2="60" y2="20" style="stroke:#57575F;stroke-width:1.5"/><polyline points="30,130 60,20 150,130 180,20 30,130" fill="none" style="stroke:#6C6CFF;stroke-width:2"/></svg>',
+      tetrahedron: '<svg viewBox="0 0 200 160" width="200" height="160"><polyline points="40,130 170,120 100,30 40,130" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><line x1="100" y1="30" x2="110" y2="110" style="stroke:#57575F;stroke-width:1.5;stroke-dasharray:3 2"/><line x1="40" y1="130" x2="110" y2="110" style="stroke:#57575F;stroke-width:1.5;stroke-dasharray:3 2"/><line x1="170" y1="120" x2="110" y2="110" style="stroke:#57575F;stroke-width:1.5;stroke-dasharray:3 2"/><text x="96" y="22" fill="#8E8E96" font-size="13">S</text><text x="26" y="146" fill="#8E8E96" font-size="13">A</text><text x="174" y="136" fill="#8E8E96" font-size="13">C</text><text x="112" y="122" fill="#8E8E96" font-size="13">B</text></svg>',
+      bisectors: '<svg viewBox="0 0 220 130" width="220" height="130"><polyline points="20,110 200,110 150,20 20,110" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="20" y1="110" x2="150" y2="20" style="stroke:#6C6CFF;stroke-width:1.5"/><line x1="200" y1="110" x2="20" y2="110" style="stroke:#8E8E96;stroke-width:0"/><line x1="200" y1="110" x2="90" y2="55" style="stroke:#FF9F0A;stroke-width:1.5"/><circle cx="118" cy="68" r="3" fill="#6C6CFF"/><text x="8" y="126" fill="#8E8E96" font-size="13">A</text><text x="202" y="126" fill="#8E8E96" font-size="13">B</text><text x="146" y="15" fill="#8E8E96" font-size="13">C</text><text x="122" y="62" fill="#6C6CFF" font-size="13">O</text></svg>',
+      hexPrism: '<svg viewBox="0 0 220 170" width="220" height="170"><polygon points="70,30 150,30 190,65 150,100 70,100 30,65" fill="none" style="stroke:#57575F;stroke-width:1.5"/><polygon points="70,80 150,80 190,115 150,150 70,150 30,115" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><line x1="70" y1="30" x2="70" y2="80" style="stroke:#57575F;stroke-width:1.5"/><line x1="150" y1="30" x2="150" y2="80" style="stroke:#57575F;stroke-width:1.5"/><line x1="190" y1="65" x2="190" y2="115" style="stroke:#57575F;stroke-width:1.5"/><line x1="30" y1="65" x2="30" y2="115" style="stroke:#57575F;stroke-width:1.5"/></svg>',
+      derivGraph: '<svg viewBox="0 0 220 150" width="220" height="150"><line x1="15" y1="130" x2="210" y2="130" style="stroke:#57575F;stroke-width:1.5"/><line x1="15" y1="130" x2="15" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M25,100 C55,20 85,20 100,70 C115,120 140,130 160,80 C175,40 190,25 205,30" fill="none" style="stroke:#6C6CFF;stroke-width:2"/></svg>',
+      parabolas: '<svg viewBox="0 0 200 170" width="200" height="170"><line x1="15" y1="150" x2="190" y2="150" style="stroke:#57575F;stroke-width:1.5"/><line x1="100" y1="160" x2="100" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M30,20 Q100,170 175,25" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><path d="M55,150 Q100,10 150,70" fill="none" style="stroke:#FF9F0A;stroke-width:2"/><circle cx="86" cy="52" r="3" fill="#8E8E96"/><circle cx="130" cy="110" r="3" fill="#8E8E96"/></svg>',
+      logGraph: '<svg viewBox="0 0 200 150" width="200" height="150"><line x1="15" y1="130" x2="190" y2="130" style="stroke:#57575F;stroke-width:1.5"/><line x1="15" y1="130" x2="15" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M30,125 C55,70 90,35 180,25" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><text x="4" y="40" fill="#8E8E96" font-size="11">1</text></svg>',
+      shadedArea: '<svg viewBox="0 0 200 140" width="200" height="140"><line x1="15" y1="120" x2="190" y2="120" style="stroke:#57575F;stroke-width:1.5"/><line x1="60" y1="130" x2="60" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M30,115 L30,35 L95,35 L95,115 Z" fill="rgba(255,159,10,.3)" stroke="none"/><path d="M20,112 C35,15 75,15 100,112" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><text x="22" y="134" fill="#8E8E96" font-size="11">-11</text><text x="88" y="134" fill="#8E8E96" font-size="11">-9</text></svg>'
+    };
 
-    let mathStarted = false;
+    const MATH_VARIANTS = {
+      v1: { label: 'Вариант 1', items: [
+        { text: 'В треугольнике ABC угол C равен 90°, CH — высота, AB = 13, tgA = 1/5. Найдите AH.', diagram: '<img src="images/math/task1_triangle.png" alt="" />', answers: ['12.5'] },
+        { text: 'Две стороны прямоугольника ABCD равны 6 и 8. Диагонали пересекаются в точке O. Найдите длину разности векторов AO и DO.', diagram: '<img src="images/math/task2_rect.png" alt="" />', answers: ['8'] },
+        { text: 'Объём параллелепипеда ABCDA₁B₁C₁D₁ равен 4,5. Найдите объём треугольной пирамиды AD₁CB₁.', diagram: '<img src="images/math/task3_parallelepiped.png" alt="" />', answers: ['1.5'] },
+        { text: 'В соревновании по биатлону участвуют спортсмены из 25 стран, одна из которых — Россия. Всего на старт вышло 60 участников, из которых 6 — из России. Порядок старта определяется жребием. Какова вероятность того, что десятым стартовал спортсмен из России?', diagram: null, answers: ['0.1'] },
+        { text: 'В кармане у Пети было 2 монеты по 5 рублей и 4 монеты по 10 рублей. Петя не глядя переложил какие-то 3 монеты в другой карман. Найдите вероятность того, что пятирублёвые монеты лежат теперь в разных карманах.', diagram: null, answers: ['0.6'] },
+        { text: 'Монету подбрасывают 6 раз. Найдите математическое ожидание количества выпавших орлов.', diagram: null, answers: ['3'] },
+        { text: 'Найдите корни уравнения cos(π(x−7)/3) = 1/2. В ответ запишите наибольший отрицательный корень.', diagram: null, answers: ['-4'] },
+        { text: 'Найдите p(x) + p(6−x), если p(x) = x(6−x)/(x−3) при x ≠ 3.', diagram: null, answers: ['0'] },
+        { text: 'На рисунке изображён график функции y = f(x). Прямая, проходящая через начало координат, касается графика в точке с абсциссой 8. Найдите f′(8).', diagram: '<img src="images/math/task9_graph.png" alt="" />', answers: ['1.25'] },
+        { text: 'При температуре 0°C рельс имеет длину l₀ = 10 м. Длина при нагреве меняется по закону l(t) = l₀(1 + α·t), где α = 1,2·10⁻⁵ (°C)⁻¹. При какой температуре рельс удлинится на 3 мм? Ответ в °C.', diagram: null, answers: ['25'] },
+        { text: 'Первый велосипедист выехал из посёлка со скоростью 15 км/ч. Через час после него со скоростью 10 км/ч выехал второй велосипедист, а ещё через час — третий. Найдите скорость третьего велосипедиста, если сначала он догнал второго, а через 2 ч 20 мин после этого догнал первого. Ответ в км/ч.', diagram: null, answers: ['25'] },
+        { text: 'На рисунке изображён график функции f(x) = kx + b. Найдите f(−5).', diagram: '<img src="images/math/task12_graph.png" alt="" />', answers: ['-10'] }
+      ]},
+      v2: { label: 'Вариант 2', items: [
+        { text: 'В треугольнике ABC угол C равен 90°, AC = 2, sinA = √17/17. Найдите BC.', diagram: SVG.triangleH, answers: ['0.5'] },
+        { text: 'На координатной плоскости изображены векторы a и b. Найдите их скалярное произведение a·b.', diagram: null, answers: ['12'] },
+        { text: 'В правильной треугольной пирамиде боковое ребро равно 5, а тангенс угла между боковой гранью и плоскостью основания равен 0,25√11. Найдите сторону основания пирамиды.', diagram: SVG.tetrahedron, answers: ['8'] },
+        { text: 'На олимпиаде по русскому языку 250 участников разместили в трёх аудиториях. В первых двух удалось разместить по 120 человек, оставшихся перевели в запасную аудиторию в другом корпусе. Найдите вероятность того, что случайно выбранный участник писал олимпиаду в запасной аудитории.', diagram: null, answers: ['0.04'] },
+        { text: 'Автоматическая линия изготавливает батарейки. Вероятность того, что батарейка неисправна, равна 0,02. Система контроля бракует неисправную батарейку с вероятностью 0,99, а исправную — по ошибке с вероятностью 0,01. Найдите вероятность того, что случайно выбранная батарейка будет забракована системой контроля.', diagram: null, answers: ['0.0296'] },
+        { text: 'Из 12 опрошенных жителей города 6 ответили «Да». Найдите нижнюю границу доверительного интервала доли горожан по правилу «частота ± 2 стандартных отклонения». Ответ округлите до десятых.', diagram: null, answers: ['0.2'] },
+        { text: 'Найдите корень уравнения (x−1)³ = −8.', diagram: null, answers: ['-1'] },
+        { text: 'Найдите 2p(x−7) − p(2x), если p(x) = x − 3.', diagram: null, answers: ['-17'] },
+        { text: 'Функция y = f(x) определена и непрерывна на [−5; 5]. На рисунке — график её производной. Найдите точку x₀, в которой функция принимает наименьшее значение, если f(−5) ≥ f(5).', diagram: SVG.derivGraph, answers: ['3'] },
+        { text: 'Объём и давление газа связаны соотношением p₁V₁^1.4 = p₂V₂^1.4. Изначально объём равен 256 л при давлении 1 атм. До какого объёма нужно сжать газ, чтобы давление стало 128 атмосфер? Ответ в литрах.', diagram: null, answers: ['8'] },
+        { text: 'Катер весной идёт против течения в 1⅔ раза медленнее, чем по течению. Летом течение на 1 км/ч медленнее, и катер идёт против течения в 1½ раза медленнее, чем по течению. Найдите скорость течения весной (в км/ч).', diagram: null, answers: ['5'] },
+        { text: 'На рисунке изображён график функции f(x) = b + logₐx. Найдите f(32).', diagram: SVG.logGraph, answers: ['2'] }
+      ]},
+      v3: { label: 'Вариант 3', items: [
+        { text: 'В треугольнике ABC угол C равен 58°, AD и BE — биссектрисы, пересекающиеся в точке O. Найдите угол AOB (в градусах).', diagram: SVG.bisectors, answers: ['119'] },
+        { text: 'Две стороны прямоугольника ABCD равны 6 и 8. Найдите длину разности векторов AB и AD.', diagram: SVG.rectDiag, answers: ['10'] },
+        { text: 'Найдите объём многогранника ABCA₁B₁C₁ — половины правильной шестиугольной призмы, площадь основания которой равна 6, а боковое ребро равно 3.', diagram: SVG.hexPrism, answers: ['3'] },
+        { text: 'На экзамен вынесено 60 вопросов, Андрей не выучил 3 из них. Найдите вероятность того, что ему попадётся выученный вопрос.', diagram: null, answers: ['0.95'] },
+        { text: 'Вероятность того, что чайник прослужит больше года, равна 0,97, а больше двух лет — 0,89. Найдите вероятность того, что он прослужит меньше двух лет, но больше года.', diagram: null, answers: ['0.08'] },
+        { text: 'Нужно, чтобы с вероятностью не менее 0,95 частота отклонялась от истинной вероятности не более чем на 0,05. Сколько избирателей необходимо опросить?', diagram: null, answers: ['2000'] },
+        { text: 'Решите уравнение (x−6)² = −24x.', diagram: null, answers: ['-6'] },
+        { text: 'Найдите значение выражения √50·cos²(9π/8) − √50·sin²(9π/8).', diagram: null, answers: ['5'] },
+        { text: 'На рисунке — график производной функции f(x) на интервале (−10; 2). Найдите количество точек, в которых касательная к графику f(x) параллельна прямой y = −2x−11 или совпадает с ней.', diagram: SVG.derivGraph, answers: ['5'] },
+        { text: 'Камень брошен вертикально вверх: h(t) = −5t² + 18t. Сколько секунд камень находился на высоте не менее 9 метров?', diagram: null, answers: ['2.4'] },
+        { text: 'Четыре одинаковые рубашки дешевле куртки на 8%. На сколько процентов пять таких же рубашек дороже куртки?', diagram: null, answers: ['15'] },
+        { text: 'На рисунке — графики функций f(x) = 4x² − 25x + 41 и g(x) = ax² + bx + c, пересекающиеся в точках A и B. Найдите ординату точки B.', diagram: SVG.parabolas, answers: ['62'] }
+      ]},
+      v4: { label: 'Вариант 4', items: [
+        { text: 'В треугольнике ABC AC = BC = 27, AH — высота, sinBAC = 2/3. Найдите BH.', diagram: null, answers: ['30'] },
+        { text: 'Две стороны прямоугольника ABCD равны 6 и 8. Найдите длину вектора AC.', diagram: SVG.rectVec, answers: ['10'] },
+        { text: 'Боковые рёбра треугольной пирамиды взаимно перпендикулярны, каждое равно 3. Найдите объём пирамиды.', diagram: SVG.tetrahedron, answers: ['4.5'] },
+        { text: 'В группе туристов 30 человек, вертолёт забрасывает их в район по 6 человек за рейс случайным образом. Найдите вероятность того, что турист П. полетит первым рейсом.', diagram: null, answers: ['0.2'] },
+        { text: 'Шахматист А. выигрывает у Б. белыми с вероятностью 0,52, чёрными — 0,3. Играются две партии со сменой цвета. Найдите вероятность того, что А. выиграет оба раза.', diagram: null, answers: ['0.156'] },
+        { text: 'Случайная величина X принимает значения 0 и a>0, P(X=0)=0,8, дисперсия D(X)=1,44. Найдите математическое ожидание X.', diagram: null, answers: ['0.6'] },
+        { text: 'Найдите корень уравнения (x+89)/(x−7) = −5/(x−7).', diagram: null, answers: ['-94'] },
+        { text: 'Найдите значение выражения 5tg(5π−γ) − tg(−γ), если tgγ = 7.', diagram: null, answers: ['-28'] },
+        { text: 'На рисунке — график функции y=f(x). Функция F(x)=x³+30x²+302x−15/8 — одна из первообразных f(x). Найдите площадь закрашенной фигуры.', diagram: SVG.shadedArea, answers: ['6'] },
+        { text: 'Два тела массой 2 кг каждое движутся со скоростью 10 м/с под углом 2α друг к другу. Энергия соударения Q = mv²sin²α. Под каким наименьшим углом 2α (в градусах) должны двигаться тела, чтобы выделилось не менее 50 Дж?', diagram: null, answers: ['60'] },
+        { text: 'Два сухогруза (120 м и 80 м) идут параллельными курсами. Сначала расстояние от кормы первого до носа второго — 400 м, через 12 минут расстояние от кормы второго до носа первого — 600 м. На сколько км/ч скорость первого меньше скорости второго?', diagram: null, answers: ['6'] },
+        { text: 'На рисунке — график функции f(x) = ax² + bx + c, где a, b, c — целые числа. Найдите f(1).', diagram: SVG.parabolas, answers: ['11'] }
+      ]}
+    };
+
+    let currentVariant = 'v1';
     let mathIndex = 0;
 
+    function renderVariantList() {
+      const list = document.getElementById('variantList');
+      list.innerHTML = Object.entries(MATH_VARIANTS).map(([key, v]) => `
+        <div class="subject-card" data-variant="${key}">
+          <div class="subject-badge subject-badge--math"><span class="subject-glyph">${key.slice(1)}</span></div>
+          <div class="subject-info">
+            <div class="subject-name">${v.label}</div>
+            <div class="subject-sub">12 заданий</div>
+          </div>
+          <div class="subject-arrow">›</div>
+        </div>`).join('');
+      list.querySelectorAll('[data-variant]').forEach(card => {
+        card.addEventListener('click', () => {
+          tg?.HapticFeedback?.impactOccurred('light');
+          currentVariant = card.dataset.variant;
+          document.getElementById('mathEgeTitle').textContent = MATH_VARIANTS[currentVariant].label;
+          document.querySelectorAll('#view-lessons .lessons-screen.show').forEach(s => s.classList.remove('show'));
+          document.getElementById('screenMathEge').classList.add('show');
+          startMathExercise();
+        });
+      });
+    }
+
     function startMathExercise() {
-      if (mathStarted) return;
-      mathStarted = true;
+      mathIndex = 0;
       renderMathCard(mathIndex, null);
     }
 
@@ -946,10 +989,11 @@
     }
 
     function renderMathCard(idx, direction) {
+      const items = MATH_VARIANTS[currentVariant].items;
       const stage = document.getElementById('mathStage');
-      document.getElementById('mathProgress').textContent = `${Math.min(idx + 1, MATH_ITEMS.length)}/${MATH_ITEMS.length}`;
+      document.getElementById('mathProgress').textContent = `${Math.min(idx + 1, items.length)}/${items.length}`;
 
-      if (idx >= MATH_ITEMS.length) {
+      if (idx >= items.length) {
         stage.innerHTML = `
           <div class="vocab-done">
             <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
@@ -959,7 +1003,7 @@
         return;
       }
 
-      const item = MATH_ITEMS[idx];
+      const item = items[idx];
       stage.innerHTML = `
         <div class="vocab-card${direction === 'in' ? ' entering' : ''}" id="curMathCard">
           <div class="vocab-num">Задание ${idx + 1}</div>
