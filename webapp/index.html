@@ -784,6 +784,8 @@
     let vocabStarted = false;
     let vocabIndex = 0;
     let vocabSelectedWord = null;
+    let vocabBusy = false; // блокирует повторный клик, пока идёт переход между карточками
+    let vocabSkipped = 0;
     const vocabWordUsed = {}; // слово -> навсегда использовано (правильно вставлено)
 
     function startVocabExercise() {
@@ -829,13 +831,15 @@
       }
 
       if (idx >= VOCAB_ITEMS.length) {
+        const solved = VOCAB_ITEMS.length - vocabSkipped;
         stage.insertAdjacentHTML('beforeend', `
           <div class="vocab-done">
             <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
             <h3>Раздел пройден!</h3>
-            <p>Все 18 заданий по лексике выполнены верно</p>
+            <p>${vocabSkipped > 0 ? `Решено верно ${solved} из ${VOCAB_ITEMS.length}, пропущено ${vocabSkipped}` : `Все ${VOCAB_ITEMS.length} заданий по лексике выполнены верно`}</p>
           </div>`);
         document.getElementById('vocabProgress').textContent = `${VOCAB_ITEMS.length}/${VOCAB_ITEMS.length}`;
+        vocabBusy = false;
         return;
       }
 
@@ -860,6 +864,7 @@
       if (direction === 'in') {
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('entering')));
       }
+      vocabBusy = false;
 
       card.querySelectorAll('.vocab-blank').forEach(blankEl => {
         blankEl.addEventListener('click', () => {
@@ -881,6 +886,7 @@
             vocabSelectedWord = null;
 
             if (filled.every(Boolean)) {
+              vocabBusy = true;
               setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 420);
             }
           } else {
@@ -895,8 +901,11 @@
         });
       });
 
-      document.getElementById('vocabSkipBtn').addEventListener('click', () => {
+      card.querySelector('#vocabSkipBtn').addEventListener('click', () => {
+        if (vocabBusy) return;
+        vocabBusy = true;
         tg?.HapticFeedback?.impactOccurred('light');
+        vocabSkipped++;
         vocabIndex++;
         renderVocabCard(vocabIndex, 'in');
       });
@@ -980,6 +989,8 @@
 
     let currentVariant = 'v1';
     let mathIndex = 0;
+    let mathBusy = false; // блокирует повторный клик, пока идёт переход между карточками
+    let mathSkipped = 0;
 
     function renderVariantList() {
       const list = document.getElementById('variantList');
@@ -1006,6 +1017,8 @@
 
     function startMathExercise() {
       mathIndex = 0;
+      mathSkipped = 0;
+      mathBusy = false;
       renderMathCard(mathIndex, null);
     }
 
@@ -1028,12 +1041,14 @@
       }
 
       if (idx >= items.length) {
+        const solved = items.length - mathSkipped;
         stage.insertAdjacentHTML('beforeend', `
           <div class="vocab-done">
             <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
             <h3>Вариант решён!</h3>
-            <p>Все 12 заданий выполнены верно</p>
+            <p>${mathSkipped > 0 ? `Решено верно ${solved} из ${items.length}, пропущено ${mathSkipped}` : `Все ${items.length} заданий выполнены верно`}</p>
           </div>`);
+        mathBusy = false;
         return;
       }
 
@@ -1055,10 +1070,11 @@
       if (direction === 'in') {
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('entering')));
       }
+      mathBusy = false;
 
-      const input = document.getElementById('mathAnswerInput');
-      const btn = document.getElementById('mathAnswerBtn');
-      const fb = document.getElementById('mathAnswerFb');
+      const input = card.querySelector('#mathAnswerInput');
+      const btn = card.querySelector('#mathAnswerBtn');
+      const fb = card.querySelector('#mathAnswerFb');
 
       function submit() {
         const val = normalizeNum(input.value || '');
@@ -1073,6 +1089,7 @@
           tg?.HapticFeedback?.notificationOccurred('success');
           input.disabled = true;
           btn.disabled = true;
+          mathBusy = true;
           setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 480);
         } else {
           input.classList.add('wrong');
@@ -1086,8 +1103,11 @@
       btn.addEventListener('click', submit);
       input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
 
-      document.getElementById('mathSkipBtn').addEventListener('click', () => {
+      card.querySelector('#mathSkipBtn').addEventListener('click', () => {
+        if (mathBusy) return;
+        mathBusy = true;
         tg?.HapticFeedback?.impactOccurred('light');
+        mathSkipped++;
         mathIndex++;
         renderMathCard(mathIndex, 'in');
       });
