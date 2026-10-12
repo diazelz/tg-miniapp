@@ -233,10 +233,16 @@
     .vocab-stage { position: relative; min-height: 220px; }
     .vocab-card {
       background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 22px;
-      transition: transform .4s cubic-bezier(.22,1,.36,1), opacity .4s cubic-bezier(.22,1,.36,1);
+      transition: transform .42s cubic-bezier(.65,0,.35,1), opacity .3s ease;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
     }
-    .vocab-card.leaving { transform: translateX(-120%); opacity: 0; }
-    .vocab-card.entering { transform: translateX(120%); opacity: 0; }
+    /* Уходящая карточка выходит из потока и лежит поверх места следующей —
+       так обе анимируются одновременно (настоящий кроссфейд-слайд), а не
+       друг за другом, и блок не "прыгает" по высоте между кадрами. */
+    .vocab-card.leaving-overlay { position: absolute; top: 0; left: 0; right: 0; z-index: 1; pointer-events: none; }
+    .vocab-card.leaving { transform: translateX(-112%); opacity: 0; transition-timing-function: cubic-bezier(.55,0,.85,.35); }
+    .vocab-card.entering { transform: translateX(112%); opacity: 0; }
     .vocab-num { font-size: 12px; font-weight: 800; color: var(--accent); margin-bottom: 10px; letter-spacing: .02em; }
     .vocab-text { font-size: 15.5px; line-height: 1.85; color: var(--white); }
     .vocab-blank {
@@ -810,15 +816,25 @@
 
     function renderVocabCard(idx, direction) {
       const stage = document.getElementById('vocabStage');
-      document.getElementById('vocabProgress').textContent = `${idx + 1}/${VOCAB_ITEMS.length}`;
+      document.getElementById('vocabProgress').textContent = `${Math.min(idx + 1, VOCAB_ITEMS.length)}/${VOCAB_ITEMS.length}`;
+
+      // Старую карточку не стираем сразу — кладём её поверх (overlay) и запускаем
+      // выезд, пока одновременно в потоке встаёт новая. Так обе едут разом,
+      // без паузы между "ушла" и "появилась", и блок не дёргается по высоте.
+      const oldCard = document.getElementById('curVocabCard');
+      if (oldCard) {
+        oldCard.removeAttribute('id');
+        oldCard.classList.add('leaving-overlay', 'leaving');
+        setTimeout(() => oldCard.remove(), 430);
+      }
 
       if (idx >= VOCAB_ITEMS.length) {
-        stage.innerHTML = `
+        stage.insertAdjacentHTML('beforeend', `
           <div class="vocab-done">
             <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
             <h3>Раздел пройден!</h3>
             <p>Все 18 заданий по лексике выполнены верно</p>
-          </div>`;
+          </div>`);
         document.getElementById('vocabProgress').textContent = `${VOCAB_ITEMS.length}/${VOCAB_ITEMS.length}`;
         return;
       }
@@ -839,7 +855,7 @@
         return html;
       }
 
-      stage.innerHTML = buildCardHTML();
+      stage.insertAdjacentHTML('beforeend', buildCardHTML());
       const card = document.getElementById('curVocabCard');
       if (direction === 'in') {
         requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('entering')));
@@ -865,10 +881,7 @@
             vocabSelectedWord = null;
 
             if (filled.every(Boolean)) {
-              setTimeout(() => {
-                card.classList.add('leaving');
-                setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 380);
-              }, 450);
+              setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 420);
             }
           } else {
             blankEl.classList.add('wrong');
@@ -884,8 +897,8 @@
 
       document.getElementById('vocabSkipBtn').addEventListener('click', () => {
         tg?.HapticFeedback?.impactOccurred('light');
-        card.classList.add('leaving');
-        setTimeout(() => { vocabIndex++; renderVocabCard(vocabIndex, 'in'); }, 380);
+        vocabIndex++;
+        renderVocabCard(vocabIndex, 'in');
       });
     }
 
@@ -1005,18 +1018,27 @@
       const stage = document.getElementById('mathStage');
       document.getElementById('mathProgress').textContent = `${Math.min(idx + 1, items.length)}/${items.length}`;
 
+      // Та же схема, что и в словарном упражнении: старая карточка не стирается,
+      // а выезжает поверх (overlay), пока новая уже встала в поток — едут одновременно.
+      const oldCard = document.getElementById('curMathCard');
+      if (oldCard) {
+        oldCard.removeAttribute('id');
+        oldCard.classList.add('leaving-overlay', 'leaving');
+        setTimeout(() => oldCard.remove(), 430);
+      }
+
       if (idx >= items.length) {
-        stage.innerHTML = `
+        stage.insertAdjacentHTML('beforeend', `
           <div class="vocab-done">
             <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
             <h3>Вариант решён!</h3>
             <p>Все 12 заданий выполнены верно</p>
-          </div>`;
+          </div>`);
         return;
       }
 
       const item = items[idx];
-      stage.innerHTML = `
+      stage.insertAdjacentHTML('beforeend', `
         <div class="vocab-card${direction === 'in' ? ' entering' : ''}" id="curMathCard">
           <div class="vocab-num">Задание ${idx + 1}</div>
           <div class="vocab-text">${item.text}</div>
@@ -1027,7 +1049,7 @@
           </div>
           <div class="answer-fb" id="mathAnswerFb"></div>
           <button class="skip-btn" id="mathSkipBtn">Пропустить задание →</button>
-        </div>`;
+        </div>`);
 
       const card = document.getElementById('curMathCard');
       if (direction === 'in') {
@@ -1051,10 +1073,7 @@
           tg?.HapticFeedback?.notificationOccurred('success');
           input.disabled = true;
           btn.disabled = true;
-          setTimeout(() => {
-            card.classList.add('leaving');
-            setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 380);
-          }, 500);
+          setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 480);
         } else {
           input.classList.add('wrong');
           fb.textContent = 'Неверно, попробуйте ещё раз';
@@ -1069,8 +1088,8 @@
 
       document.getElementById('mathSkipBtn').addEventListener('click', () => {
         tg?.HapticFeedback?.impactOccurred('light');
-        card.classList.add('leaving');
-        setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 380);
+        mathIndex++;
+        renderMathCard(mathIndex, 'in');
       });
     }
 
