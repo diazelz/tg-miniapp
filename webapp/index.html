@@ -262,6 +262,32 @@
     .vocab-done h3 { font-size: 18px; font-weight: 800; }
     .vocab-done p { font-size: 13.5px; color: var(--dim); }
 
+    /* --- Задания ЕГЭ (математика): чертёж + поле ответа --- */
+    .math-diagram {
+      display: flex; justify-content: center; align-items: center;
+      background: var(--card-2); border: 1px solid var(--line); border-radius: 16px;
+      padding: 14px; margin: 14px 0; min-height: 120px;
+    }
+    .math-diagram svg { max-width: 100%; height: auto; }
+    .answer-row { display: flex; gap: 10px; margin-top: 16px; }
+    .answer-input {
+      flex: 1; min-width: 0;
+      background: var(--card-2); border: 1.5px solid var(--line); border-radius: 13px;
+      padding: 12px 14px; font-size: 15px; font-weight: 700; color: var(--white);
+      font-family: inherit; transition: border-color .18s, background .18s;
+    }
+    .answer-input:focus { outline: none; border-color: var(--accent); }
+    .answer-input.wrong { border-color: #FF5C5C; background: rgba(255,92,92,.1); animation: chipShake .4s; }
+    .answer-input.correct { border-color: var(--accent); background: rgba(108,108,255,.12); }
+    .answer-btn {
+      background: var(--accent); border: none; border-radius: 13px; padding: 0 20px;
+      color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; transition: transform .12s, opacity .12s;
+    }
+    .answer-btn:active { transform: scale(.95); }
+    .answer-fb { font-size: 12.5px; margin-top: 8px; min-height: 16px; font-weight: 700; }
+    .answer-fb.ok { color: var(--accent); }
+    .answer-fb.bad { color: #FF5C5C; }
+
     #view-progress, #view-lessons { display: none; }
     #view-progress.show, #view-lessons.show { display: block; }
 
@@ -395,7 +421,7 @@
         <div class="subject-arrow">›</div>
       </div>
 
-      <div class="subject-card" data-subject="math">
+      <div class="subject-card" data-subject="math" data-open="screenMathFolders">
         <div class="subject-badge subject-badge--math">
           <span class="subject-glyph">+−</span>
         </div>
@@ -417,6 +443,38 @@
         <div class="subject-arrow">›</div>
       </div>
     </div>
+    </div>
+
+    <!-- Экран: папки Математика (ЕГЭ) -->
+    <div class="lessons-screen" id="screenMathFolders">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenSubjects" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">Математика</div>
+      </div>
+      <div class="subjects">
+        <div class="subject-card" data-open="screenMathEge">
+          <div class="subject-badge subject-badge--math"><span class="subject-glyph">ЕГЭ</span></div>
+          <div class="subject-info">
+            <div class="subject-name">ЕГЭ</div>
+            <div class="subject-sub">12 заданий · вариант 1</div>
+          </div>
+          <div class="subject-arrow">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Экран: задания ЕГЭ по математике (1–12, профильный уровень) -->
+    <div class="lessons-screen" id="screenMathEge">
+      <div class="screen-header">
+        <button class="back-btn" data-back="screenMathFolders" aria-label="Назад">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="screen-title">ЕГЭ</div>
+        <div class="screen-sub-badge" id="mathProgress">1/12</div>
+      </div>
+      <div class="vocab-stage" id="mathStage"></div>
     </div>
 
     <!-- Экран: папки English (ЕГЭ / TOEFL) -->
@@ -642,6 +700,7 @@
         document.querySelectorAll('#view-lessons .lessons-screen.show').forEach(s => s.classList.remove('show'));
         target.classList.add('show');
         if (card.dataset.open === 'screenVocab') startVocabExercise();
+        if (card.dataset.open === 'screenMathEge') startMathExercise();
       });
     });
     document.querySelectorAll('#view-lessons [data-back]').forEach(btn => {
@@ -805,6 +864,151 @@
           }
         });
       });
+    }
+
+    // ---- Задания ЕГЭ по математике (профильный уровень, 1–12) ----
+    // Текст заданий и ответы — по варианту, который прислал пользователь (открытый банк ФИПИ).
+    // Чертежи — свои SVG-иллюстрации под палитру приложения, не копии оригинальных рисунков.
+    const MATH_ITEMS = [
+      {
+        text: 'В треугольнике ABC угол C равен 90°, CH — высота, AB = 13, tgA = 1/5. Найдите AH.',
+        diagram: '<svg viewBox="0 0 220 130" width="220" height="130"><polyline points="20,110 200,110 150,20 20,110" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="150" y1="20" x2="150" y2="110" style="stroke:#6C6CFF;stroke-width:2;stroke-dasharray:4 3"/><text x="8" y="126" fill="#8E8E96" font-size="13">A</text><text x="202" y="126" fill="#8E8E96" font-size="13">B</text><text x="146" y="15" fill="#8E8E96" font-size="13">C</text><text x="154" y="126" fill="#6C6CFF" font-size="13">H</text></svg>',
+        answers: ['12.5']
+      },
+      {
+        text: 'Две стороны прямоугольника ABCD равны 6 и 8. Диагонали пересекаются в точке O. Найдите длину разности векторов AO и DO.',
+        diagram: '<svg viewBox="0 0 200 140" width="200" height="140"><rect x="20" y="20" width="160" height="100" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="20" y1="20" x2="180" y2="120" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="20" x2="20" y2="120" style="stroke:#57575F;stroke-width:1.5"/><circle cx="100" cy="70" r="3" fill="#6C6CFF"/><text x="6" y="16" fill="#8E8E96" font-size="13">B</text><text x="184" y="16" fill="#8E8E96" font-size="13">C</text><text x="6" y="134" fill="#8E8E96" font-size="13">A</text><text x="184" y="134" fill="#8E8E96" font-size="13">D</text><text x="106" y="64" fill="#6C6CFF" font-size="13">O</text></svg>',
+        answers: ['8']
+      },
+      {
+        text: 'Объём параллелепипеда ABCDA₁B₁C₁D₁ равен 4,5. Найдите объём треугольной пирамиды AD₁CB₁.',
+        diagram: '<svg viewBox="0 0 220 160" width="220" height="160"><polygon points="30,130 150,130 180,100 60,100" fill="none" style="stroke:#57575F;stroke-width:1.5"/><polygon points="30,50 150,50 180,20 60,20" fill="none" style="stroke:#57575F;stroke-width:1.5"/><line x1="30" y1="130" x2="30" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="150" y1="130" x2="150" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="100" x2="180" y2="20" style="stroke:#57575F;stroke-width:1.5"/><line x1="60" y1="100" x2="60" y2="20" style="stroke:#57575F;stroke-width:1.5"/><polyline points="30,130 60,20 150,130 180,20 30,130" fill="none" style="stroke:#6C6CFF;stroke-width:2"/></svg>',
+        answers: ['1.5']
+      },
+      {
+        text: 'В соревновании по биатлону участвуют спортсмены из 25 стран, одна из которых — Россия. Всего на старт вышло 60 участников, из которых 6 — из России. Порядок старта определяется жребием. Какова вероятность того, что десятым стартовал спортсмен из России?',
+        diagram: null,
+        answers: ['0.1']
+      },
+      {
+        text: 'В кармане у Пети было 2 монеты по 5 рублей и 4 монеты по 10 рублей. Петя не глядя переложил какие-то 3 монеты в другой карман. Найдите вероятность того, что пятирублёвые монеты лежат теперь в разных карманах.',
+        diagram: null,
+        answers: ['0.6']
+      },
+      {
+        text: 'Монету подбрасывают 6 раз. Найдите математическое ожидание количества выпавших орлов.',
+        diagram: null,
+        answers: ['3']
+      },
+      {
+        text: 'Найдите корни уравнения cos(π(x−7)/3) = 1/2. В ответ запишите наибольший отрицательный корень.',
+        diagram: null,
+        answers: ['-4']
+      },
+      {
+        text: 'Найдите p(x) + p(6−x), если p(x) = x(6−x)/(x−3) при x ≠ 3.',
+        diagram: null,
+        answers: ['0']
+      },
+      {
+        text: 'На рисунке изображён график функции y = f(x). Прямая, проходящая через начало координат, касается графика в точке с абсциссой 8. Найдите f′(8).',
+        diagram: '<svg viewBox="0 0 220 160" width="220" height="160"><line x1="15" y1="140" x2="210" y2="140" style="stroke:#57575F;stroke-width:1.5"/><line x1="15" y1="140" x2="15" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M30,135 C60,40 110,10 150,30 C175,42 190,70 200,110" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><line x1="15" y1="140" x2="165" y2="35" style="stroke:#FF9F0A;stroke-width:1.5;stroke-dasharray:4 3"/><circle cx="165" cy="35" r="3" fill="#FF9F0A"/><text x="158" y="153" fill="#8E8E96" font-size="11">8</text><text x="2" y="38" fill="#8E8E96" font-size="11">10</text></svg>',
+        answers: ['1.25']
+      },
+      {
+        text: 'При температуре 0°C рельс имеет длину l₀ = 10 м. Длина при нагреве меняется по закону l(t) = l₀(1 + α·t), где α = 1,2·10⁻⁵ (°C)⁻¹. При какой температуре рельс удлинится на 3 мм? Ответ в °C.',
+        diagram: null,
+        answers: ['25']
+      },
+      {
+        text: 'Первый велосипедист выехал из посёлка со скоростью 15 км/ч. Через час после него со скоростью 10 км/ч выехал второй велосипедист, а ещё через час — третий. Найдите скорость третьего велосипедиста, если сначала он догнал второго, а через 2 ч 20 мин после этого догнал первого. Ответ в км/ч.',
+        diagram: null,
+        answers: ['25']
+      },
+      {
+        text: 'На рисунке изображён график функции f(x) = kx + b. Найдите f(−5).',
+        diagram: '<svg viewBox="0 0 200 160" width="200" height="160"><line x1="15" y1="140" x2="190" y2="140" style="stroke:#57575F;stroke-width:1.5"/><line x1="100" y1="150" x2="100" y2="10" style="stroke:#57575F;stroke-width:1.5"/><line x1="40" y1="155" x2="170" y2="25" style="stroke:#6C6CFF;stroke-width:2"/><circle cx="110" cy="120" r="3" fill="#FF9F0A"/><circle cx="130" cy="100" r="3" fill="#FF9F0A"/><text x="104" y="152" fill="#8E8E96" font-size="11">O</text><text x="112" y="132" fill="#8E8E96" font-size="11">1</text></svg>',
+        answers: ['-10']
+      }
+    ];
+
+    let mathStarted = false;
+    let mathIndex = 0;
+
+    function startMathExercise() {
+      if (mathStarted) return;
+      mathStarted = true;
+      renderMathCard(mathIndex, null);
+    }
+
+    function normalizeNum(s) {
+      return s.trim().replace(',', '.').replace(/\s+/g, '').replace('−', '-');
+    }
+
+    function renderMathCard(idx, direction) {
+      const stage = document.getElementById('mathStage');
+      document.getElementById('mathProgress').textContent = `${Math.min(idx + 1, MATH_ITEMS.length)}/${MATH_ITEMS.length}`;
+
+      if (idx >= MATH_ITEMS.length) {
+        stage.innerHTML = `
+          <div class="vocab-done">
+            <div class="vocab-done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <h3>Вариант решён!</h3>
+            <p>Все 12 заданий выполнены верно</p>
+          </div>`;
+        return;
+      }
+
+      const item = MATH_ITEMS[idx];
+      stage.innerHTML = `
+        <div class="vocab-card${direction === 'in' ? ' entering' : ''}" id="curMathCard">
+          <div class="vocab-num">Задание ${idx + 1}</div>
+          <div class="vocab-text">${item.text}</div>
+          ${item.diagram ? `<div class="math-diagram">${item.diagram}</div>` : ''}
+          <div class="answer-row">
+            <input type="text" inputmode="decimal" class="answer-input" id="mathAnswerInput" placeholder="Ответ" autocomplete="off" />
+            <button class="answer-btn" id="mathAnswerBtn">Ответить</button>
+          </div>
+          <div class="answer-fb" id="mathAnswerFb"></div>
+        </div>`;
+
+      const card = document.getElementById('curMathCard');
+      if (direction === 'in') {
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('entering')));
+      }
+
+      const input = document.getElementById('mathAnswerInput');
+      const btn = document.getElementById('mathAnswerBtn');
+      const fb = document.getElementById('mathAnswerFb');
+
+      function submit() {
+        const val = normalizeNum(input.value || '');
+        if (!val) return;
+        const correct = item.answers.some(a => normalizeNum(a) === val);
+
+        if (correct) {
+          input.classList.remove('wrong');
+          input.classList.add('correct');
+          fb.textContent = 'Верно!';
+          fb.className = 'answer-fb ok';
+          tg?.HapticFeedback?.notificationOccurred('success');
+          input.disabled = true;
+          btn.disabled = true;
+          setTimeout(() => {
+            card.classList.add('leaving');
+            setTimeout(() => { mathIndex++; renderMathCard(mathIndex, 'in'); }, 380);
+          }, 500);
+        } else {
+          input.classList.add('wrong');
+          fb.textContent = 'Неверно, попробуйте ещё раз';
+          fb.className = 'answer-fb bad';
+          tg?.HapticFeedback?.notificationOccurred('error');
+          setTimeout(() => input.classList.remove('wrong'), 450);
+        }
+      }
+
+      btn.addEventListener('click', submit);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
     }
 
     // ---- Реальный трекинг времени в приложении ----
