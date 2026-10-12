@@ -265,10 +265,10 @@
     /* --- Задания ЕГЭ (математика): чертёж + поле ответа --- */
     .math-diagram {
       display: flex; justify-content: center; align-items: center;
-      background: var(--card-2); border: 1px solid var(--line); border-radius: 16px;
-      padding: 14px; margin: 14px 0; min-height: 120px;
+      background: #FFFFFF; border: 1px solid var(--line); border-radius: 16px;
+      padding: 12px; margin: 14px 0; min-height: 120px;
     }
-    .math-diagram svg { max-width: 100%; height: auto; }
+    .math-diagram img { max-width: 100%; height: auto; display: block; border-radius: 8px; }
     .answer-row { display: flex; gap: 10px; margin-top: 16px; }
     .answer-input {
       flex: 1; min-width: 0;
@@ -872,17 +872,17 @@
     const MATH_ITEMS = [
       {
         text: 'В треугольнике ABC угол C равен 90°, CH — высота, AB = 13, tgA = 1/5. Найдите AH.',
-        diagram: '<svg viewBox="0 0 220 130" width="220" height="130"><polyline points="20,110 200,110 150,20 20,110" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="150" y1="20" x2="150" y2="110" style="stroke:#6C6CFF;stroke-width:2;stroke-dasharray:4 3"/><text x="8" y="126" fill="#8E8E96" font-size="13">A</text><text x="202" y="126" fill="#8E8E96" font-size="13">B</text><text x="146" y="15" fill="#8E8E96" font-size="13">C</text><text x="154" y="126" fill="#6C6CFF" font-size="13">H</text></svg>',
+        diagram: '<img src="images/math/task1_triangle.png" alt="Треугольник ABC с высотой CH" />',
         answers: ['12.5']
       },
       {
         text: 'Две стороны прямоугольника ABCD равны 6 и 8. Диагонали пересекаются в точке O. Найдите длину разности векторов AO и DO.',
-        diagram: '<svg viewBox="0 0 200 140" width="200" height="140"><rect x="20" y="20" width="160" height="100" fill="none" style="stroke:#8E8E96;stroke-width:2"/><line x1="20" y1="20" x2="180" y2="120" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="20" x2="20" y2="120" style="stroke:#57575F;stroke-width:1.5"/><circle cx="100" cy="70" r="3" fill="#6C6CFF"/><text x="6" y="16" fill="#8E8E96" font-size="13">B</text><text x="184" y="16" fill="#8E8E96" font-size="13">C</text><text x="6" y="134" fill="#8E8E96" font-size="13">A</text><text x="184" y="134" fill="#8E8E96" font-size="13">D</text><text x="106" y="64" fill="#6C6CFF" font-size="13">O</text></svg>',
+        diagram: '<img src="images/math/task2_rect.png" alt="Прямоугольник ABCD с диагоналями" />',
         answers: ['8']
       },
       {
         text: 'Объём параллелепипеда ABCDA₁B₁C₁D₁ равен 4,5. Найдите объём треугольной пирамиды AD₁CB₁.',
-        diagram: '<svg viewBox="0 0 220 160" width="220" height="160"><polygon points="30,130 150,130 180,100 60,100" fill="none" style="stroke:#57575F;stroke-width:1.5"/><polygon points="30,50 150,50 180,20 60,20" fill="none" style="stroke:#57575F;stroke-width:1.5"/><line x1="30" y1="130" x2="30" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="150" y1="130" x2="150" y2="50" style="stroke:#57575F;stroke-width:1.5"/><line x1="180" y1="100" x2="180" y2="20" style="stroke:#57575F;stroke-width:1.5"/><line x1="60" y1="100" x2="60" y2="20" style="stroke:#57575F;stroke-width:1.5"/><polyline points="30,130 60,20 150,130 180,20 30,130" fill="none" style="stroke:#6C6CFF;stroke-width:2"/></svg>',
+        diagram: '<img src="images/math/task3_parallelepiped.png" alt="Параллелепипед ABCDA1B1C1D1 с пирамидой AD1CB1" />',
         answers: ['1.5']
       },
       {
@@ -912,7 +912,7 @@
       },
       {
         text: 'На рисунке изображён график функции y = f(x). Прямая, проходящая через начало координат, касается графика в точке с абсциссой 8. Найдите f′(8).',
-        diagram: '<svg viewBox="0 0 220 160" width="220" height="160"><line x1="15" y1="140" x2="210" y2="140" style="stroke:#57575F;stroke-width:1.5"/><line x1="15" y1="140" x2="15" y2="10" style="stroke:#57575F;stroke-width:1.5"/><path d="M30,135 C60,40 110,10 150,30 C175,42 190,70 200,110" fill="none" style="stroke:#6C6CFF;stroke-width:2"/><line x1="15" y1="140" x2="165" y2="35" style="stroke:#FF9F0A;stroke-width:1.5;stroke-dasharray:4 3"/><circle cx="165" cy="35" r="3" fill="#FF9F0A"/><text x="158" y="153" fill="#8E8E96" font-size="11">8</text><text x="2" y="38" fill="#8E8E96" font-size="11">10</text></svg>',
+        diagram: '<img src="images/math/task9_graph.png" alt="График функции y=f(x) с касательной из начала координат" />',
         answers: ['1.25']
       },
       {
@@ -927,7 +927,7 @@
       },
       {
         text: 'На рисунке изображён график функции f(x) = kx + b. Найдите f(−5).',
-        diagram: '<svg viewBox="0 0 200 160" width="200" height="160"><line x1="15" y1="140" x2="190" y2="140" style="stroke:#57575F;stroke-width:1.5"/><line x1="100" y1="150" x2="100" y2="10" style="stroke:#57575F;stroke-width:1.5"/><line x1="40" y1="155" x2="170" y2="25" style="stroke:#6C6CFF;stroke-width:2"/><circle cx="110" cy="120" r="3" fill="#FF9F0A"/><circle cx="130" cy="100" r="3" fill="#FF9F0A"/><text x="104" y="152" fill="#8E8E96" font-size="11">O</text><text x="112" y="132" fill="#8E8E96" font-size="11">1</text></svg>',
+        diagram: '<img src="images/math/task12_graph.png" alt="График линейной функции f(x)=kx+b" />',
         answers: ['-10']
       }
     ];
